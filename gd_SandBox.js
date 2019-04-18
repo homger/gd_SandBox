@@ -10,7 +10,8 @@ class gd_SandBox{
         
         if(!STYLE_MOUNTED)
         this.mountStyle();
-
+        this.eventsSet = false;
+        this.setEvents();
         if(data instanceof Array){
             this.loadData(data);
         }
@@ -24,14 +25,77 @@ class gd_SandBox{
             cach = gd_SandBox_file(file);
             this.fileListViewer.appendChild(cach);
         });
+    }
+
+    setEvents(){
 
         this.fileListViewer.addEventListener("click", function( {target}){
             if(target !== this.fileListViewer){
-                if( typeof target.open !== undefined && !target.open ){
+                /*if( typeof target.open !== undefined && !target.open ){
                     this.editor1.value = target.content;
-                }
+                    console.log(target.name + " Opened");
+                }*/
+                this.openFile(target);
             }
         }.bind(this) );
+
+        this.selectedEditor = this.editor1;
+
+        this.editors.forEach(editor => {
+            editor.addEventListener("focus", event => {
+                this.selectedEditor = event.target;
+                editor.value = editor.selectedFile.content;
+            });
+
+            editor.addEventListener("keyup", event => {
+                if(editor.selectedFile.open){
+                    editor.selectedFile.content = editor.value;
+                    if(editor.selectedFile.doubleOpen){
+                        editor.sibling.value = editor.selectedFile.content;
+                    }
+                }
+            });
+        });
+        
+
+    }
+    openFile(file){
+        if(file.open){
+            if(this.selectedEditor.selectedFile === null){
+                this.selectedEditor.selectedFile = file;
+                this.selectedEditor.value = file.content;
+                file.doubleOpen = true;
+                return;
+            }
+            if(!file === this.selectedEditor.selectedFile){
+                this.selectedEditor.selectedFile = null;
+                if(!this.selectedEditor.doubleOpen){
+                    this.selectedEditor.selectedFile.open = false;
+                }
+                this.selectedEditor.selectedFile.doubleOpen = false;
+                this.selectedEditor.selectedFile = file;
+                this.selectedEditor.value = file.content;
+                file.doubleOpen = true;
+            }
+        }
+        else{
+            file.doubleOpen = false;
+            if(this.selectedEditor.selectedFile === null){
+                this.selectedEditor.selectedFile = file;
+                this.selectedEditor.value = file.content;
+                
+                file.open = true;
+                return;
+            }
+            this.selectedEditor.selectedFile = null;
+            if(this.selectedEditor.selectedFile !== null && !this.selectedEditor.selectedFile.doubleOpen){
+                this.selectedEditor.selectedFile.open = false;
+            }
+            
+            this.selectedEditor.selectedFile = file;
+            this.selectedEditor.value = file.content;
+            file.open = true;
+        }
     }
 
     mountWidgets(container){
@@ -44,7 +108,9 @@ class gd_SandBox{
 
             this.editor1 = document.createElement("textarea");
             this.editor2 = document.createElement("textarea");
-
+            this.editor1.sibling = this.editor2;
+            this.editor2.sibling = this.editor1;
+            this.editors = [this.editor1, this.editor2];
             let gd_SandBox_editorContainer = document.createElement("div");
             gd_SandBox_editorContainer.className = "gd_SandBox_editorContainer";
             gd_SandBox_editorContainer.appendChild(this.editor1);
@@ -61,8 +127,12 @@ class gd_SandBox{
 
             this.container.className = "gd_SandBox_Container";
             this.documentViewer.className = "gd_SandBox_documentViewer";
-            this.editor1.className = "gd_SandBox_editor";
-            this.editor2.className = "gd_SandBox_editor";
+            
+            this.editors.forEach(editor => {
+                editor.className = "gd_SandBox_editor";
+                editor.selectedFile = null;
+            });
+
             this.fileListViewer.className = "gd_SandBox_fileListViewer";
             this.controlPanel.className = "gd_SandBox_controlPanel";
 
