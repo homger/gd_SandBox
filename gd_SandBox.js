@@ -44,7 +44,8 @@ class gd_SandBox{
         this.editors.forEach(editor => {
             editor.addEventListener("focus", event => {
                 this.selectedEditor = event.target;
-                editor.value = editor.selectedFile.content;
+                if(!this.selectedEditor.selectedFile === null)
+                    editor.value = editor.selectedFile.content;
             });
 
             editor.addEventListener("keyup", event => {
@@ -62,39 +63,39 @@ class gd_SandBox{
     openFile(file){
         if(file.open){
             if(this.selectedEditor.selectedFile === null){
+                file.doubleOpen = true;
                 this.selectedEditor.selectedFile = file;
                 this.selectedEditor.value = file.content;
-                file.doubleOpen = true;
                 return;
             }
-            if(!file === this.selectedEditor.selectedFile){
-                this.selectedEditor.selectedFile = null;
-                if(!this.selectedEditor.doubleOpen){
+            if(this.selectedEditor.selectedFile !== file){
+                if(!this.selectedEditor.selectedFile.doubleOpen){
                     this.selectedEditor.selectedFile.open = false;
                 }
                 this.selectedEditor.selectedFile.doubleOpen = false;
+                this.selectedEditor.selectedFile = null;
                 this.selectedEditor.selectedFile = file;
-                this.selectedEditor.value = file.content;
                 file.doubleOpen = true;
+                this.selectedEditor.value = file.content;
+                return;
             }
         }
         else{
-            file.doubleOpen = false;
             if(this.selectedEditor.selectedFile === null){
                 this.selectedEditor.selectedFile = file;
                 this.selectedEditor.value = file.content;
-                
                 file.open = true;
                 return;
             }
-            this.selectedEditor.selectedFile = null;
-            if(this.selectedEditor.selectedFile !== null && !this.selectedEditor.selectedFile.doubleOpen){
+            
+            if(!this.selectedEditor.selectedFile.doubleOpen){
                 this.selectedEditor.selectedFile.open = false;
             }
-            
+            this.selectedEditor.selectedFile.doubleOpen = false;
+            this.selectedEditor.selectedFile = null;
             this.selectedEditor.selectedFile = file;
-            this.selectedEditor.value = file.content;
             file.open = true;
+            this.selectedEditor.value = file.content;
         }
     }
 
