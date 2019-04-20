@@ -15,18 +15,42 @@ class gd_SandBox{
         if(data instanceof Array){
             this.loadData(data);
         }
+        this.resetDocumentViewer();
     }
 
     loadData(data){
+        this.body = BODY;
+        this.style = STYLE;
+        this.script = SCRIPT;
         this.fileList = data;
-        
+
         let cach;
         this.fileList.forEach(file => {
-            cach = gd_SandBox_file(file);
+            cach = gd_SandBox_file(this, file);
             this.fileListViewer.appendChild(cach);
         });
+
+        
     }
 
+    parseFiles(){
+        let doc = `
+        <body>${this.body.content}</body>
+        <style>${this.style.content}</style>
+        <script>${this.script.content}</script>
+        `;
+        this.parsed_document = document.createElement("html");
+        this.parsed_document.innerHTML = doc;
+        this.view_src = URL.createObjectURL(new Blob([doc], {type: "text/html",}));
+    }
+    resetDocumentViewer(){
+        this.parseFiles();
+        this.documentViewer.src = this.view_src;
+        this.documentViewer.onload = function(){
+            console.log("Document viewer ready");
+        }
+        //
+    }
     setEvents(){
 
         this.fileListViewer.addEventListener("click", function( {target}){
@@ -58,8 +82,23 @@ class gd_SandBox{
             });
         });
         
+        this.observer = new MutationObserver(function(mutationArray){
+            
+            mutationArray.forEach(mutation => {
+                if(mutation.type == "childList"){
+                    
+                    if(mutation.removedNodes.length > 0){
+                        this.documentViewerSetup();
+                    }
+                }
+            });
+        }.bind(this));
+
+        //this.observer.observe(this.documentViewer.contentDocument.documentElement, {"childList" : true,});
 
     }
+    
+    
     openFile(file){
         if(file.open){
             if(this.selectedEditor.selectedFile === null){
@@ -106,6 +145,7 @@ class gd_SandBox{
             
             this.container = document.createElement("div");
             this.documentViewer = document.createElement("iframe");
+            this.documentViewer.sandbox = "allow-scripts";
 
             this.editor1 = document.createElement("textarea");
             this.editor2 = document.createElement("textarea");
@@ -118,7 +158,13 @@ class gd_SandBox{
             gd_SandBox_editorContainer.appendChild(this.editor2);
 
             this.fileListViewer = document.createElement("div");
-            this.controlPanel = document.createElement("div");            
+            this.controlPanel = document.createElement("div");
+            
+            let b = document.createElement("button");
+            b.innerHTML = "RESET";
+            b.onclick = this.resetDocumentViewer.bind(this);
+            this.controlPanel.appendChild(b);
+            
             container.appendChild(this.container);
 
             this.container.appendChild(this.controlPanel);
@@ -151,18 +197,48 @@ class gd_SandBox{
 
 //gd_SandBox Default stylesheet
 
-function gd_SandBox_file(file){
+var gd_SandBox_file = function(sandbox, file){
 
     let div = document.createElement("div");
     div.name = file.name ? file.name : undefined;
-    div.type = file.type ? file.type : undefined;
+
+
+    
     div.content = file.content ? file.content : "";
     div.className = "gd_SandBox_fileName";
     div.innerHTML = div.name;
     div.open = file.open ? false : false;
+    div.doubleOpen = false;
+
+    div.isIndex = file.name.toLowerCase() == "index.html" ? true : false;
+    
+    div.type = typeof file.type !== undefined && file.type == "css" ||
+    file.type == "js" ? file.type.toLowerCase() : div.name instanceof String ?
+    
+    div.name.slice(div.name.lastIndexOf(".")).toLowerCase() : undefined ;
+
+    div.isStyle = div.type == "css";
+    div.isScript = div.type == "js";
+    
+    if(div.isIndex){
+        sandbox.body = div;
+        return div;
+    }
+    else if(file.name.toLowerCase() == "style.css" ? true : false){
+        sandbox.style = div;
+        return div;
+    }
+    else if(file.name.toLowerCase() == "script.js" ? true : false){
+        sandbox.script = div;
+        return div;
+    }
+
     return div;
 }
 
+const STYLE = ``;
+const BODY = ` TEST 11`;
+const SCRIPT = ``;
 const DEAFULT_STYLE_SHEET = `
         .gd_SandBox_Container{
             position: relative;
