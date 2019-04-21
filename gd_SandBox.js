@@ -1,7 +1,6 @@
 'use strict';
 var STYLE_MOUNTED = false;
 
-
 class gd_SandBox{
     constructor(container, data){
 
@@ -24,13 +23,67 @@ class gd_SandBox{
         this.script = SCRIPT;
         this.fileList = data;
 
-        let cach;
         this.fileList.forEach(file => {
-            cach = gd_SandBox_file(this, file);
-            this.fileListViewer.appendChild(cach);
+            this.addFile(file);
         });
 
+    }
+
+    addFile(file){
+        this.fileList.push(gd_SandBox_file(this, file));
+        this.fileListViewer.appendChild(this.fileList[this.fileList.length - 1]);
+    }
+    __mkFile(file){
+
+        if(!file.name instanceof String)
+            file.name = "undefined";
         
+        if(!file.content instanceof String)
+            file.content = "";
+
+        file.className = "gd_SandBox_fileName";
+
+        file.open = false;
+        file.doubleOpen = false;
+    
+        file.isIndex = file.name.toLowerCase() == "index.html" ? true : false;
+        
+        if(file.type instanceof String){
+            file.type = file.type.toLowerCase();
+            if(!FILE_TYPE.includes(file.type))
+                file.type = "undefined";
+        }
+        else if(file.name != "undefined"){
+            let dotIndex = file.name.lastIndexOf(".");
+
+            if(dotIndex != -1){
+                file.type = file.name.slice(dotIndex).toLowerCase();
+                if(!FILE_TYPE.includes(file.type)){
+                    file.type = "undefined";   
+                }
+            }
+            else{
+            }
+        }
+        else{
+            file.type = "undefined";
+        } 
+        file.isStyle = div.type == "css";
+        file.isScript = div.type == "js";
+        
+        if(div.isIndex){
+            sandbox.body = div;
+            return div;
+        }
+        else if(file.name.toLowerCase() == "style.css" ? true : false){
+            sandbox.style = div;
+            return div;
+        }
+        else if(file.name.toLowerCase() == "script.js" ? true : false){
+            sandbox.script = div;
+            return div;
+        }
+
     }
 
     parseFiles(){
@@ -66,15 +119,26 @@ class gd_SandBox{
         this.selectedEditor = this.editor1;
 
         this.editors.forEach(editor => {
+            
+            editor.addEventListener("change", event => {
+                //this.resetDocumentViewer();
+            });
+
             editor.addEventListener("focus", event => {
                 this.selectedEditor = event.target;
                 if(!this.selectedEditor.selectedFile === null)
                     editor.value = editor.selectedFile.content;
+                else if(this.selectedEditor.selectedFile === null){
+                    this.addFile({name: "new file"});
+                    this.openFile(this.fileList[this.fileList.length - 1]);
+                }
+                
             });
 
             editor.addEventListener("keyup", event => {
                 if(editor.selectedFile.open){
                     editor.selectedFile.content = editor.value;
+                    this.resetDocumentViewer();
                     if(editor.selectedFile.doubleOpen){
                         editor.sibling.value = editor.selectedFile.content;
                     }
@@ -145,7 +209,7 @@ class gd_SandBox{
             
             this.container = document.createElement("div");
             this.documentViewer = document.createElement("iframe");
-            this.documentViewer.sandbox = "allow-scripts";
+            //this.documentViewer.sandbox = "allow-cross-origin allow-same-origin allow-scripts";
 
             this.editor1 = document.createElement("textarea");
             this.editor2 = document.createElement("textarea");
@@ -236,6 +300,7 @@ var gd_SandBox_file = function(sandbox, file){
     return div;
 }
 
+const FILE_TYPE = ["css", "js", "html"];
 const STYLE = ``;
 const BODY = ` TEST 11`;
 const SCRIPT = ``;
