@@ -4,7 +4,7 @@ var STYLE_MOUNTED = false;
 class gd_SandBox{
     constructor(container, data){
 
-        this.widgetsMounted = false;
+        /*this.widgetsMounted = false;
         this.mountWidgets(container);
         
         if(!STYLE_MOUNTED)
@@ -25,10 +25,21 @@ class gd_SandBox{
 
         this.fileList.forEach(file => {
             this.addFile(file);
+        });*/
+
+        this.editor = new _gd_sandbox_editor();
+        container.appendChild(this.editor._textArea);
+        let file = new _gd_sandbox_file(...data);
+        this.editor.file = file;
+        console.log(file.fileData);
+        let t = new _gd_sandbox_viewer();
+        document.body.appendChild(t.iframe);
+        this.editor._textArea.addEventListener("keyup",() =>{
+            t.document = file.content;
         });
 
     }
-
+/*
     addFile(file){
         this.fileList.push(gd_SandBox_file(this, file));
         this.fileListViewer.appendChild(this.fileList[this.fileList.length - 1]);
@@ -406,4 +417,4 @@ const DEAFULT_STYLE_SHEET = `
             height: 50%;
             width: 100%;
         }
-        `;
+        `;*/
