@@ -11,7 +11,7 @@ class _gd_sandbox_editor{
     }
 
     set file(file){
-        _gd_sandbox_file_isValid(file);
+        //_gd_sandbox_file_isValid(file);
         if(file.open()){
             this._file = file;
             this._textArea.value = this.file.content;

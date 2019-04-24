@@ -34,12 +34,24 @@ class gd_SandBox{
         console.log(file.fileData);
         let t = new _gd_sandbox_viewer();
         document.body.appendChild(t.iframe);
-        this.editor._textArea.addEventListener("keyup",() =>{
+        /*this.editor._textArea.addEventListener("keyup",() =>{
             t.document = file.content;
-        });
+        });*/
+
+        let button = document.createElement("button");
+        button.innerHTML = "RELOAD";
+        button.onclick = () =>{
+            t.document = file.content;
+        }
+        document.body.appendChild(button);
+        button.style.position = "absolute";
+        button.style.bottom = "30%";
+        button.style.left = "50%";
+
+
 
     }
-/*
+
     addFile(file){
         this.fileList.push(gd_SandBox_file(this, file));
         this.fileListViewer.appendChild(this.fileList[this.fileList.length - 1]);
@@ -417,4 +429,4 @@ const DEAFULT_STYLE_SHEET = `
             height: 50%;
             width: 100%;
         }
-        `;*/
+        `;

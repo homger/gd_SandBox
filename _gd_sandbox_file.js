@@ -35,8 +35,18 @@ class _gd_sandbox_file{
     constructor(name, MIME, content, creationDate = Date.now(), lastModified = Date.now()){
         
         this.isValid(name, MIME, creationDate, lastModified);
-    
-        this.name = name;
+        
+        this._path = "/";
+        if(name.includes("/")){
+            let index = name.lastIndexOf("/");
+            this.name = this.name.slice(index + 1);
+            this._path += name.slice(0, index);
+            if(this._path[1] == "/")
+                this._path = this._path.slice(1);
+        }
+        else
+            this.name = name;
+        this.trueName = this._path + this.name;
         this.MIME = MIME;
         this._content = content;
         this._creationDate = creationDate;
@@ -84,7 +94,9 @@ class _gd_sandbox_file{
         return {
             lastModified: new Date(this._lastModified).toString(),//Date(this.file.lastModified).toString(),
             creationDate: new Date(this._creationDate).toString(),
-            name: this._name,
+            name: this.name,
+            trueName: this.trueName,
+            path: this._path,
             MIME: this.MIME,
             content: this.content,
         };
@@ -99,7 +111,12 @@ class _gd_sandbox_file{
             throw new Error ("'creationDate' is not number");
         if(isNaN(lastModified))
             throw new Error ("'lastModified' is not number");
-    
+        if(name.includes("/")){
+            let index = name.lastIndexOf("/");
+            if(index == name.length - 1 || name.includes("//")){
+                throw new Error ("'name' Is invalid");
+            }
+        }
         return true;
     }
 
