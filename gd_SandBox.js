@@ -47,8 +47,12 @@ class gd_SandBox{
         button.style.position = "absolute";
         button.style.bottom = "30%";
         button.style.left = "50%";
-
-
+        this.folder = new _gd_sandbox_folder("entry");//,{folders: "lol", files: "tg"});
+        console.log(this.folder instanceof _gd_sandbox_folder);
+        let f1 = new _gd_sandbox_folder("f1");
+        f1.addFile( new _gd_sandbox_file("f2", "text/javascript"));
+        this.folder.addFolder(f1);
+        console.log(this.folder);
 
     }
 

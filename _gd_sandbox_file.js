@@ -37,24 +37,32 @@ class _gd_sandbox_file{
         this.isValid(name, MIME, creationDate, lastModified);
         
         this._path = "/";
-        if(name.includes("/")){
-            let index = name.lastIndexOf("/");
-            this.name = this.name.slice(index + 1);
-            this._path += name.slice(0, index);
-            if(this._path[1] == "/")
-                this._path = this._path.slice(1);
-        }
-        else
-            this.name = name;
-        this.trueName = this._path + this.name;
-        this.MIME = MIME;
+        this._name = name;
+        this._fullName = this._path + this._name;
+        this._MIME = MIME;
         this._content = content;
         this._creationDate = creationDate;
         this._lastModified = lastModified;
         this._open = false;
     }
 
-
+    set name(name){
+        this._name = name;
+        this._fullName = this._path + name;
+    }
+    set path(path){
+        this._path = path;
+        this._fullName = path + this._name;
+    }
+    get name(){
+        return this._name;
+    }
+    get path(){
+        return this._path;
+    }
+    get fullName(){
+        return this._fullName;
+    }
     open(){
         if(this._open){
             console.warn(" _gd_sandbox_file is already open");
@@ -94,11 +102,11 @@ class _gd_sandbox_file{
         return {
             lastModified: new Date(this._lastModified).toString(),//Date(this.file.lastModified).toString(),
             creationDate: new Date(this._creationDate).toString(),
-            name: this.name,
-            trueName: this.trueName,
+            name: this._name,
+            fullName: this._fullName,
             path: this._path,
-            MIME: this.MIME,
-            content: this.content,
+            MIME: this._MIME,
+            content: this._content,
         };
 
     }
@@ -112,6 +120,7 @@ class _gd_sandbox_file{
         if(isNaN(lastModified))
             throw new Error ("'lastModified' is not number");
         if(name.includes("/")){
+            throw new Error ("'name' Is invalid");
             let index = name.lastIndexOf("/");
             if(index == name.length - 1 || name.includes("//")){
                 throw new Error ("'name' Is invalid");
