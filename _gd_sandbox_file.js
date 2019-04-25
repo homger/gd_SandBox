@@ -131,15 +131,6 @@ class _gd_sandbox_file{
 
 }
 
-function _gd_sandbox_file_isValid({name, MIME, creationDate, lastModified}){
-    if(!(typeof name == "string"))
-        return false;
-    if(!(typeof MIME == "string"))
-        return false;
-    if(isNaN(creationDate))
-        return false;
-    if(isNaN(lastModified))
-        return false;
-
-    return true;
+function is_gd_sandbox_file(file){
+    return (file instanceof _gd_sandbox_file);
 }

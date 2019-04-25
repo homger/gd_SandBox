@@ -3,6 +3,7 @@
 class _gd_sandbox_editor{
     constructor(){
 
+        this._hasFile = false;
         this._textArea = document.createElement("textarea");
         this._textArea.addEventListener("keyup", function(){
             this._file.content = this._textArea.value;
@@ -12,7 +13,16 @@ class _gd_sandbox_editor{
 
     set file(file){
         //_gd_sandbox_file_isValid(file);
+        if(!is_gd_sandbox_file(file)){
+            throw new Error("file is not instanceof _gd_sandbox_file");
+        }
+        if(this._hasFile){
+            this._file.close();
+            this._file = null;
+            this._hasFile = false;
+        }
         if(file.open()){
+            this._hasFile = true;
             this._file = file;
             this._textArea.value = this.file.content;
         }
