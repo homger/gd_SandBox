@@ -54,9 +54,9 @@ class gd_SandBox{
         f1.addFile( new _gd_sandbox_file("f2", "text/javascript","Hi!"));
         this.folder.addFolder(f1);
         console.log(this.folder);
-        this.editor.setFile(f1._files[0]);
-        this.cach = f1._files[0];
-        
+        this.editor.setFile(f1.files[0]);
+        this.cach = f1.files[0];
+        console.log(this.folder.folderContent);
 
     }
 
