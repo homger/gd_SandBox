@@ -9,10 +9,6 @@ class _gd_sandbox_folder{
             throw new Error ("'name' typeof is not string");
         if(name.includes("/")){
             throw new Error ("'name' Is invalid");
-            let index = name.lastIndexOf("/");
-            if(index == name.length - 1 || name.includes("//")){
-                throw new Error ("'name' Is invalid");
-            }
         }
 
         this._name = name;
@@ -150,8 +146,8 @@ class _gd_sandbox_folder{
         return{
             name: this._name,
             path: this._path,
-            file: this.files,
-            folder: this.folders,
+            files: this.files,
+            folders: this.folders,
             creationDate: this._creationDate,
             lastModified: this._lastModified,
         }
@@ -186,13 +182,16 @@ function is_gd_sandbox_folder(folder){
     return (folder instanceof _gd_sandbox_folder);
 }
 
-function _folderFromArray(folderArray){
+function _folderFromFolderData(folderData){
     let cach;
+    let filesMap = new Map();
+    let foldersMap = new Map();
+    folderData.files.forEach(file => filesMap.set(file.name, _fileFromFileData(file)) );
     
-    cach = new _gd_sandbox_folder(folderArray[0]);
-    folderArray[1].folders.forEach(folder => cach.addFolder(_folderFromArray(folder)));
-    folderArray[1].files.forEach(file => cach.addFile(_fileFromArray(file)));
+    folderData.folders.forEach(folder => foldersMap.set(folder.name, _folderFromFolderData(folder)));
 
+    cach = new _gd_sandbox_folder(folderData.name, folderData.path, 
+        filesMap, foldersMap, folderData.creationDate, folderData.lastModified);
     ;
     return cach;
 }

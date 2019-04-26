@@ -1,36 +1,6 @@
 'use strict';
 
 
-/*function _gd_sandbox_file(name, MIME, content, creationDate = Date.now(), lastModified = Date.now()){
-    
-    
-    _gd_sandbox_file.isValid(name, MIME, creationDate, lastModified);
-
-    
-    return {
-        name : name,
-        MIME : MIME,
-        content : content,
-        creationDate : creationDate,
-        lastModified : lastModified,
-    }
-
-}
-
-_gd_sandbox_file.isValid = function(name, MIME, creationDate, lastModified){
-    
-    if(!(typeof name == "string"))
-        throw new Error ("Parameter : 'name' Is not typeof string");
-    if(!(typeof MIME == "string"))
-        throw new Error ("Parameter : 'MIME' Is not typeof string");
-    if(isNaN(creationDate))
-        throw new Error ("Parameter : 'creationDate' Is not a number");
-    if(isNaN(lastModified))
-        throw new Error ("Parameter : 'lastModified' Is not a number");
-
-    return true;
-}*/
-
 class _gd_sandbox_file{
     constructor(name, MIME, content, creationDate = Date.now(), lastModified = Date.now(),
     path = "/"){
@@ -97,14 +67,11 @@ class _gd_sandbox_file{
         return this._lastModified;
     }
     get fileData(){
-        /*const {lastModified, creationDate, name, MIME, content} = this.file;
-        let m = new Date(lastModified);
-        let c = new Date(creationDate);*/
         return {
             name: this._name,
             MIME: this._MIME,
             content: this._content,
-            lastModified: this._lastModified,//Date(this.file.lastModified).toString(),
+            lastModified: this._lastModified,
             creationDate: this._creationDate,
             path: this._path,
             fullName: this._fullName,
@@ -132,15 +99,9 @@ class _gd_sandbox_file{
         return true;
     }
 }
-function _fileFromArray(file){
-    //constructor(name, MIME, content, creationDate = Date.now(), lastModified = Date.now())
-    let cach = new _gd_sandbox_file(file[1]._name, file[1]._MIME, file[1]._content,
-        file[1]._creationDate,  file[1]._lastModified);
-
-        cach._path =  file[1]._path;
-        cach._fullName =  file[1]._fullName;
-        cach._open =  file[1]._open;
-    return cach;
+function _fileFromFileData(file){
+    return new _gd_sandbox_file(file.name, file.MIME, file.content,
+        file.creationDate, file.lastModified, file.path);
 }
 function is_gd_sandbox_file(file){
     return (file instanceof _gd_sandbox_file);
