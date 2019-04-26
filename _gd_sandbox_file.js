@@ -32,11 +32,12 @@ _gd_sandbox_file.isValid = function(name, MIME, creationDate, lastModified){
 }*/
 
 class _gd_sandbox_file{
-    constructor(name, MIME, content, creationDate = Date.now(), lastModified = Date.now()){
+    constructor(name, MIME, content, creationDate = Date.now(), lastModified = Date.now(),
+    path = "/"){
         
-        this.isValid(name, MIME, creationDate, lastModified);
+        this.isValid(name, MIME, creationDate, lastModified, path);
         
-        this._path = "/";
+        this._path = path;
         this._name = name;
         this._fullName = this._path + this._name;
         this._MIME = MIME;
@@ -100,17 +101,17 @@ class _gd_sandbox_file{
         let m = new Date(lastModified);
         let c = new Date(creationDate);*/
         return {
-            lastModified: new Date(this._lastModified).toString(),//Date(this.file.lastModified).toString(),
-            creationDate: new Date(this._creationDate).toString(),
             name: this._name,
-            fullName: this._fullName,
-            path: this._path,
             MIME: this._MIME,
             content: this._content,
+            lastModified: this._lastModified,//Date(this.file.lastModified).toString(),
+            creationDate: this._creationDate,
+            path: this._path,
+            fullName: this._fullName,
+            open: this._open,
         };
-
     }
-    isValid(name, MIME, creationDate, lastModified){
+    isValid(name, MIME, creationDate, lastModified, path){
         if(!(typeof name == "string"))
             throw new Error ("'name' typeof is not string");
         if(!(typeof MIME == "string"))
@@ -119,6 +120,8 @@ class _gd_sandbox_file{
             throw new Error ("'creationDate' is not number");
         if(isNaN(lastModified))
             throw new Error ("'lastModified' is not number");
+        if(!(typeof path == "string"))
+            throw new Error ("'path' typeof is not string");
         if(name.includes("/")){
             throw new Error ("'name' Is invalid");
             let index = name.lastIndexOf("/");
@@ -128,9 +131,17 @@ class _gd_sandbox_file{
         }
         return true;
     }
-
 }
+function _fileFromArray(file){
+    //constructor(name, MIME, content, creationDate = Date.now(), lastModified = Date.now())
+    let cach = new _gd_sandbox_file(file[1]._name, file[1]._MIME, file[1]._content,
+        file[1]._creationDate,  file[1]._lastModified);
 
+        cach._path =  file[1]._path;
+        cach._fullName =  file[1]._fullName;
+        cach._open =  file[1]._open;
+    return cach;
+}
 function is_gd_sandbox_file(file){
     return (file instanceof _gd_sandbox_file);
 }

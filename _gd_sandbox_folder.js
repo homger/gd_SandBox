@@ -2,7 +2,8 @@
 
 
 class _gd_sandbox_folder{
-    constructor(name){
+    constructor(name, path = "/", files = new Map(), folders = new Map(), 
+    creationDate = Date.now(), lastModified = Date.now() ){
 
         if(!(typeof name == "string"))
             throw new Error ("'name' typeof is not string");
@@ -14,12 +15,14 @@ class _gd_sandbox_folder{
             }
         }
 
-        this._path = "/";
         this._name = name;
+        this._path = path;
         this._fullName = this._path + this._name;
         this._childPath = this._path + this.name + "/";
-        this._files = new Map();
-        this._folders = new Map();
+        this._files = files;
+        this._folders = folders;
+        this._creationDate = creationDate;
+        this._lastModified = lastModified;
     }
     set path(path){
         console.log(path);
@@ -60,22 +63,46 @@ class _gd_sandbox_folder{
         return __nameArray(this._files);
     }
     get folders(){
-        return __valueArray(this._folders);
+        let cach = [];
+        this._folders.forEach(folder => cach.push(folder.folderData()));
+        return cach;
+    }
+    get foldersName(){
+        let cach = [];
+        this._folders.forEach(folder => cach.push(folder.name));
+        return cach;
     }
     get files(){
-        return __valueArray(this._files);
+        let cach = [];
+        this._files.forEach(file => cach.push(file.fileData));
+        return cach;
+    }
+    getFileArray(){
+        let cach = [];
+        this._files.forEach(file => cach.push(file));
+        return cach;
+    }
+    get filesName(){
+        let cach = [];
+        this._files.forEach(file => cach.push(file._name));
+        return cach;
     }
     get folderContentList(){
-        return{
-            filesList: this.filesList,
-            foldersList: this.foldersList,
-        };
+        let cach = [];
+        this._folders.forEach(folder => cach.push([folder.name]));
+        return[{
+            files: this.filesList,
+            folders: cach,
+        }];
     }
     get folderContent(){
-        return{
+        let cach = [];
+        
+        this._folders.forEach(folder => cach.push(folder.folderContent) );
+        return[this.name,{
             files: this.files,
-            folders: this.folders,
-        };
+            folders: cach,
+        }];
     }
     addFolder(folder){
         if(!is_gd_sandbox_folder(folder)){
@@ -113,6 +140,22 @@ class _gd_sandbox_folder{
             this._files.set(name, file);
         } );
     }
+
+    _folderFromArray(folderArray){
+        if(!(folderArray instanceof Array)){
+            throw new Error("folderArray is not instanceof Array");
+        }
+    }
+    folderData(){
+        return{
+            name: this._name,
+            path: this._path,
+            file: this.files,
+            folder: this.folders,
+            creationDate: this._creationDate,
+            lastModified: this._lastModified,
+        }
+    }
 }
 
 
@@ -134,14 +177,7 @@ function __nameArray(map){
 function __valueArray(map){
     let cach = [];
     map.forEach(element => {
-        if((element instanceof _gd_sandbox_folder)){
-            cach.push(element.name, {
-                folders: element.foldersList,
-                files: element.filesList,
-            })    
-        }
-        else
-            cach.push([element.name,element]);
+        cach.push([element.name,element]);
     });
     return cach;
 }
@@ -150,8 +186,13 @@ function is_gd_sandbox_folder(folder){
     return (folder instanceof _gd_sandbox_folder);
 }
 
-function __mapFromArray(arr){
-    let map = new Map();
-    arr.forEach((item) => map.set(eleme,value));
-    return map;
+function _folderFromArray(folderArray){
+    let cach;
+    
+    cach = new _gd_sandbox_folder(folderArray[0]);
+    folderArray[1].folders.forEach(folder => cach.addFolder(_folderFromArray(folder)));
+    folderArray[1].files.forEach(file => cach.addFile(_fileFromArray(file)));
+
+    ;
+    return cach;
 }

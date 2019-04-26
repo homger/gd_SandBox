@@ -43,6 +43,7 @@ class gd_SandBox{
         button.innerHTML = "RELOAD";
         button.onclick = () => {
             t.document = this.cach.content;
+            console.log(this.folder.folderData());
         }
         document.body.appendChild(button);
         button.style.position = "absolute";
@@ -54,9 +55,15 @@ class gd_SandBox{
         f1.addFile( new _gd_sandbox_file("f2", "text/javascript","Hi!"));
         this.folder.addFolder(f1);
         console.log(this.folder);
-        this.editor.setFile(f1.files[0]);
-        this.cach = f1.files[0];
-        console.log(this.folder.folderContent);
+        let file2 = f1.getFileArray()[0];
+        this.editor.setFile(file2);
+        this.cach = file2;
+        file2.content = JSON.stringify(this.folder.folderData());
+        console.log(JSON.stringify(this.folder.folderData()));
+        console.log(JSON.parse( JSON.stringify(this.folder.folderData())));
+        console.log("||__||");
+        console.log(this.folder);
+        console.log(_folderFromArray(this.folder.folderData()));
 
     }
 
