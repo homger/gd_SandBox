@@ -6,6 +6,17 @@ class gd_SandBox{
         this.container = document.createElement("main");
         this.container.innerHTML = `
         <header></header>
+        <nav></nav>
+        <section class="edit-section">
+            <header></header>
+        </section>
+        <section class="view-section"></section>
+        <footer></footer>
         `;
+
+
+
+        this.container.className ="cc";
+        container.appendChild(this.container);
     }
 }
