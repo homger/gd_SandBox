@@ -19,10 +19,13 @@ class gd_SandBox{
         iframe.src = "w";
         d.appendChild(iframe);
         this.container.className ="cc";
-        this.container.appendChild(d);
+        //this.container.appendChild(d);
         container.appendChild(this.container);
-        _gd_window(d, this.container);
-
+        let ww = new __gd_window(d, this.container.querySelector(".edit-section"));
+        this.container.querySelector(".edit-section").appendChild(d)
+        /*ww.size_half();
+        ww.size_full();
+        ww.size_half();*/
         //test(d);
     }
 }

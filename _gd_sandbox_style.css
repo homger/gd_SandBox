@@ -31,21 +31,21 @@
     height: 85%;
     width: 80%;
 }
-.cc > .view-section{
+.cc .view-section{
     box-sizing: border-box;
     position: absolute;
-    bottom: 50px;
-    right: 50px;
-    height: 100px;
-    width: 175px;
+    top: 70%;
+    left: 65%;
+    height: 75px;
+    width: 150px;
     z-index: 10;
     margin: 0;
     padding: 0;
     background-color: blanchedalmond;
-    /*transition-property: right, bottom;
-    /*transition: ease-out 0.1s;*/
+    /*transition-property: , bottom;*/
+    transition: left ease-out 0.1s, top ease-out 0.1s, width ease-in-out 1s, height ease-in-out 1s;
 }
-.cc > .view-section > *{
+.cc .view-section > *{
     position: absolute;
     top: 30px;
     left: 0;
@@ -53,6 +53,26 @@
     width: 100%;
     margin: 0;
     padding: 0;
-    background-color: palevioletred;
+    background-color: rgba(51, 255, 0, 0.507);
     z-index: 0;
+}
+.cc .view-section  .control-panel{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 30px;
+    background-color: tomato;
+    width: 100%;
+}
+.cc .view-section  .control-panel > div{
+    box-sizing: border-box;
+    position: relative;
+    display: inline-block;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: blueviolet;
+    border: 2px solid black;
+    width: 32%;
+    margin: 0;
 }
