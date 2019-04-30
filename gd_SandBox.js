@@ -19,9 +19,9 @@ class gd_SandBox{
         iframe.src = "w";
         d.appendChild(iframe);
         this.container.className ="cc";
-        this.container.appendChild(d);
+        document.body.appendChild(d);
         container.appendChild(this.container);
-        let ww = new __gd_window(d, this.container.querySelector("nav"));
+        let ww = new __gd_window(d, this.container.querySelector("header"));
         //this.container.querySelector(".edit-section").appendChild(d)
         /*ww.size_half();
         ww.size_full();
