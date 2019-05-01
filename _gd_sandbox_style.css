@@ -31,11 +31,19 @@
     left: 20%;
     height: 85%;
     width: 80%;
+    /*border-radius: 50%;*/
+}
+.cc > .edit-section > *{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    /*border-radius: 50%;*/
 }
 .view-section *{
     box-sizing: border-box;
     border: 1px solid black;
-
 }
 .view-section{
     box-sizing: border-box;
@@ -54,18 +62,27 @@
     transition: left ease-out 0.1s, top ease-out 0.1s, width ease-in-out 1s, height ease-in-out 1s;
     /*z-index: 1;*/
 }
-.view-section > *{
+.view-section > iframe{
+    display: block;
+    position: absolute;
+    left: 0;
+    top: calc(10% + 30px);
+    height: calc(90% - 30px);
+    width: 100%;
+}
+._gd_window{
     position: absolute;
     top: 30px;
     left: 0;
     height: calc(90% - 30px);
     width: 100%;
+    height: 100%;
     margin: 0;
     padding: 0;
     background-color: rgba(51, 255, 0, 0.507);
 }
 
-.view-section  .control-panel{
+._gd_window .control-panel{
     position: absolute;
     top: 0;
     left: 0;
@@ -73,7 +90,7 @@
     background-color: tomato;
     width: 100%;
 }
-.view-section  .control-panel > div{
+._gd_window  .control-panel > div{
     box-sizing: border-box;
     position: relative;
     display: inline-block;

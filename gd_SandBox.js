@@ -22,6 +22,14 @@ class gd_SandBox{
         document.body.appendChild(d);
         container.appendChild(this.container);
         let ww = new __gd_window(d, this.container.querySelector("section"));
+        let files = [];
+        files.push(new _gd_sandbox_file("ONE", "text/js","console.log('lolmdr')"));
+        let editors = [];
+        editors.push(new _gd_sandbox_editor());
+        
+        this.container.querySelector(".edit-section").appendChild(editors[0]._textArea);
+        editors[0].setFile(files[0]);
+
         //this.container.querySelector(".edit-section").appendChild(d)
         /*ww.size_half();
         ww.size_full();

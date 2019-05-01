@@ -152,6 +152,7 @@ class __gd_window{
         this.htmlBlockElementToMove.style.left = this.left + "px";
     }
     styleSetup(){
+        this.movingDiv.className = "_gd_window";
         this.movingDiv.style.position = "absolute";
         this.movingDiv.style.boxSizing = "border-box";
         this.movingDiv.style.top = "0";
