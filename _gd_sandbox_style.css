@@ -63,14 +63,8 @@
     margin: 0;
     padding: 0;
     background-color: rgba(51, 255, 0, 0.507);
-    z-index: -1;
 }
-.view-section > iframe{
-    z-index: 0;
-}
-.view-section > div:active{
-    z-index: 1;
-}
+
 .view-section  .control-panel{
     position: absolute;
     top: 0;

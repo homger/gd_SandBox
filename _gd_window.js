@@ -3,13 +3,13 @@
 
 class __gd_window{
     constructor(htmlBlockElementToMove, boundingBlock = document.body,
-        default_z_index = -1, moving_z_index = 1){
+        default_z_index = -1, moving_z_index = 0){
 
             
             /*if(!parentTest(boundingBlock, html)){
                 throw new Error("!boundingBlock.childNodes.includes(htmlBlockElementToMove) === false");
             }*/
-            this.parentSetUp(htmlBlockElementToMove);
+            this.elementValidation(htmlBlockElementToMove);
             this.movingDiv = document.createElement("div");
             this.default_z_index = default_z_index;
             this.moving_z_index = moving_z_index;
@@ -132,11 +132,18 @@ class __gd_window{
         });
         this.movingDiv.appendChild(this.controlPanel);
     }
-    parentSetUp(htmlBlockElementToMove){
+    elementValidation(htmlBlockElementToMove){
         if(!(htmlBlockElementToMove.parentNode.nodeName === document.body.nodeName)){
             throw new Error("htmlBlockElementToMove is not direct child of document.body");
         }
-        
+        let zIndex = 1;
+        let cachZindex;
+        htmlBlockElementToMove.childNodes.forEach(child =>{
+            cachZindex = window.getComputedStyle(child).getPropertyValue("z-index");
+            zIndex = cachZindex > zIndex ? cachZindex : zIndex ; 
+
+        });
+        this.moving_z_index = cachZindex > this.moving_z_index ? cachZindex : this.moving_z_index;
     }
     setPosition(){
         this.limitTopLeft();
@@ -151,6 +158,7 @@ class __gd_window{
         this.movingDiv.style.left = "0";
         this.movingDiv.style.width = "100%";
         this.movingDiv.style.height = "100%";
+        this.movingDiv.style.zIndex = this.default_z_index;
         this.htmlBlockElementToMove.style.position = "absolute";
     }
     sizeCheck(){

@@ -21,7 +21,7 @@ class gd_SandBox{
         this.container.className ="cc";
         document.body.appendChild(d);
         container.appendChild(this.container);
-        let ww = new __gd_window(d, this.container.querySelector("header"));
+        let ww = new __gd_window(d, this.container.querySelector("section"));
         //this.container.querySelector(".edit-section").appendChild(d)
         /*ww.size_half();
         ww.size_full();
