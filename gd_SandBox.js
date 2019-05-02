@@ -4,37 +4,56 @@ var STYLE_MOUNTED = false;
 class gd_SandBox{
     constructor(container, data){
         this.container = document.createElement("main");
+        this.setupLayout();
         this.container.innerHTML = `
-        <header></header>
+        <header>
+            <div>
+            </div>
+            <div class="control">
+            </div>
+        </header>
         <nav></nav>
         <section class="edit-section">
             <header></header>
         </section>
         <footer></footer>
         `;
-        
+        //this.container.querySelector("header .control").appendChild(gd_SwitchButton("150px"));
         let d = document.createElement("section");
         d.className = "view-section";
         let iframe = document.createElement("iframe");
         iframe.src = "w";
-        d.appendChild(iframe);
+        
         this.container.className ="cc";
         document.body.appendChild(d);
         container.appendChild(this.container);
-        let ww = new __gd_window(d, this.container.querySelector("section"));
+        
         let files = [];
-        files.push(new _gd_sandbox_file("ONE", "text/js","console.log('lolmdr')"));
+        files.push(new _gd_sandbox_file("ONE", "text/js","LOLMDR TROLOLO"));
         let editors = [];
         editors.push(new _gd_sandbox_editor());
         
         this.container.querySelector(".edit-section").appendChild(editors[0]._textArea);
         editors[0].setFile(files[0]);
+        let viewer = _gd_sandbox_viewer();
+        viewer.style.backgroundColor = "white";
+        d.appendChild(viewer);
+        
+        viewer.setDocument(files[0].content);
+        editors[0]._textArea.addEventListener("keyup", function(){
+            viewer.setDocument(files[0].content);
+        });
+        let ww = new __gd_window(d, this.container.querySelector("section"));
 
         //this.container.querySelector(".edit-section").appendChild(d)
         /*ww.size_half();
         ww.size_full();
         ww.size_half();*/
         //test(d);
+    }
+
+    setupLayout(){
+        
     }
 }
 function test(_div){
