@@ -19,8 +19,14 @@ function gd_SwitchButton(width = 150){
             SW_BUTTON.__active = !SW_BUTTON.__active;
             SW_BUTTON.classList.toggle("active");
             
-            SW_BUTTON._indicator.style.left = SW_BUTTON.__active ? 
-            SW_BUTTON._indicator._left.active : SW_BUTTON._indicator._left.inactive;
+            if(SW_BUTTON.__active){
+                SW_BUTTON._indicator.style.left = SW_BUTTON._indicator._style.active.left;
+                SW_BUTTON._indicator.style.transform = SW_BUTTON._indicator._style.active.transform;
+            }
+            else{
+                SW_BUTTON._indicator.style.left = SW_BUTTON._indicator._style.inactive.left;
+                SW_BUTTON._indicator.style.transform = SW_BUTTON._indicator._style.inactive.transform;
+            }
         } );
 
         return SW_BUTTON;
@@ -66,9 +72,15 @@ function setStyle(button,  width){
             child.style.width = childWidth * indicatorMultiplier  + "px";
             child.style.height = childWidth * indicatorMultiplier  + "px";
             child.style.top = "calc(50% - "+indicatorMultiplier *childWidth/2+"px)";
-            child._left = {
-                active : width - childWidth / 2 *indicatorMultiplier  + "px",
-                inactive : -childWidth / 2 *indicatorMultiplier  + "px",
+            child._style = {
+                active : {
+                    left: width - childWidth / 2 *indicatorMultiplier  + "px",
+                    transform: "rotate(360deg)",
+                },
+                inactive : {
+                    left: -childWidth / 2 *indicatorMultiplier  + "px",
+                    transform: "rotate(0deg)",
+                },
             }
         }
     });
@@ -86,6 +98,8 @@ background-color: rgba(0,0,0,1);
 }
 .switch-button > .indicator{
     background-color: blue;
-    transition: left linear 0.25s;
+    background: rgb(0,86,154);
+    background: linear-gradient(45deg, rgba(0,86,154,1) 0%, rgba(0,219,255,1) 100%);
+    transition: left linear 2.25s, transform linear 2.25s;
 }
 `;
