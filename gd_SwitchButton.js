@@ -56,10 +56,8 @@ class sb{
             side.style.position = "absolute";
             side.style.height = "100%";
             side.style.zIndex = "0";
-            if(i == 0)
-                side.style.left = 0;
-            else
-                side.style.right = 0;
+            side.style.backgroundColor = "inherit";
+
             this.buttonContainerSides.push(side);
             this.buttonContainer.appendChild(side);
         }
@@ -70,7 +68,7 @@ class sb{
         this.button.style.zIndex = "2";
         this.button.style.transitionProperty = "left";
         this.button.style.transition = "linear 0.3s";
-
+        
         this.buttonContainer.appendChild(this.button);
     }
     mount(){
@@ -124,18 +122,23 @@ class sb{
             side.style.width = height;
             side.style.top = -borderWidth + "px";
             side.style.border = borderWidth + "px " +  b_top_style + " " + b_top_color;
+
+            if(i == 0)
+                side.style.left = -height/2;
+            else
+                side.style.right = -height/2;
         }
         this.button.style.height = height - borderWidth*2;
         this.button.style.width = height - borderWidth*2;
         
         this._closeData = {
             button:{
-                left: 0,
+                left: -height/2,
             }
         }
         this._openData = {
             button:{
-                left: "calc(100% - "+height+"px)",
+                left: "calc(100% - "+ height/2 +"px)",
             }
         }
         this.close();
