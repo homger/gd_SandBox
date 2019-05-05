@@ -60,7 +60,7 @@ class sb{
 
         this.button = document.createElement("div");
         this.button.style.position = "absolute";
-        this.button.style.top = "0";
+        this.button.style.borderRadius = "50%";
 
         this.buttonContainer.appendChild(this.button);
     }
@@ -116,6 +116,9 @@ class sb{
             side.style.top = -borderWidth + "px";
             side.style.border = borderWidth + "px " +  b_top_style + " " + b_top_color;
         }
+        this.button.style.height = height - borderWidth*2;
+        this.button.style.width = height - borderWidth*2;
+        this.button._active
         console.log("STYLE FIXED");
     }
 }
