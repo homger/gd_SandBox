@@ -1,9 +1,12 @@
 
 let c = document.getElementById("c");
 
-class sb{
-    constructor(buttonSize = 1, container){
-        if(isNaN(buttonSize)){
+class gd_switchButton{
+    constructor(buttonSizeMultiplier = 1, container, buttonClass = "gd_switchButton", 
+    activeButtonClass = "", inactiveButtonClass = ""){   
+        this.activeButtonClass = activeButtonClass;
+        this.inactiveButtonClass = inactiveButtonClass;     
+        if(isNaN(buttonSizeMultiplier)){
             throw new Error("buttonSize is not a number");
         }
         if( (container instanceof HTMLElement)){
@@ -12,7 +15,7 @@ class sb{
         else{
             this.dom_container = null;
         }
-
+        this.mutiplier = buttonSizeMultiplier;
         this.mainContainer = document.createElement("div");
         /**
          */
@@ -32,6 +35,8 @@ class sb{
         }
 
         this.isOpen = false;
+        this.buttonClass = buttonClass;
+        this.button.className = buttonClass;
         this.addEvents();
     }
 
@@ -66,8 +71,8 @@ class sb{
         this.button.style.position = "absolute";
         this.button.style.borderRadius = "50%";
         this.button.style.zIndex = "2";
-        this.button.style.transitionProperty = "left";
-        this.button.style.transition = "linear 0.3s";
+        /*this.button.style.transitionProperty = "left";
+        this.button.style.transition = "linear 0.3s";*/
         
         this.buttonContainer.appendChild(this.button);
     }
@@ -101,7 +106,9 @@ class sb{
 
     fixStyle(){
         let buttonContainerStyle = window.getComputedStyle(this.buttonContainer);
-        let height = this.buttonContainer.offsetHeight;
+        let height = this.buttonContainer.offsetHeight > this.buttonContainer.offsetWidth ?
+        this.buttonContainer.offsetHeight : this.buttonContainer.offsetWidth
+        ;
 
         this.buttonContainer.style.width = this.mainContainer.offsetWidth - height + "px";
         this.buttonContainer.style.left = height / 2 + "px";
@@ -128,17 +135,19 @@ class sb{
             else
                 side.style.right = -height/2;
         }
-        this.button.style.height = height - borderWidth*2;
-        this.button.style.width = height - borderWidth*2;
+        let diamerter = height*this.mutiplier - borderWidth*2;
+        this.button.style.height = diamerter;
+        this.button.style.width = diamerter;
+        this.button.style.top = "calc(50% - "+diamerter / 2+"px)";
         
         this._closeData = {
             button:{
-                left: -height/2,
+                left: -diamerter/2,
             }
         }
         this._openData = {
             button:{
-                left: "calc(100% - "+ height/2 +"px)",
+                left: "calc(100% - "+ diamerter/2 +"px)",
             }
         }
         this.close();
@@ -153,10 +162,12 @@ class sb{
     }
 
     open(){
+        this.button.className = this.buttonClass + " " + this.activeButtonClass;
         this.button.style.left = this._openData.button.left;
     }
 
     close(){
+        this.button.className = this.buttonClass + " " + this.inactiveButtonClass;
         this.button.style.left = this._closeData.button.left;
     }
     click(){
