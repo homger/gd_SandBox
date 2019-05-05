@@ -4,7 +4,7 @@ var STYLE_MOUNTED = false;
 class gd_SandBox{
     constructor(container, data){
         this.container = document.createElement("main");
-        this.setupLayout();
+        //this.setupLayout();
         this.container.innerHTML = `
         <header>
             <div>
@@ -50,10 +50,13 @@ class gd_SandBox{
         ww.size_full();
         ww.size_half();*/
         //test(d);
+        this.setupLayout();
     }
 
     setupLayout(){
-        
+        this.container.querySelector(".control").appendChild(
+            gd_SwitchButton(() => {},25)
+        );
     }
 }
 function test(_div){

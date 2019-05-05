@@ -10,6 +10,8 @@
 .cc *{
     box-sizing: border-box;
     border: 1px solid black;
+    margin: 0;
+    padding: 0;
 }
 .cc > header{
     position: absolute;
@@ -101,6 +103,10 @@
     border: 2px solid black;
     width: 15%;
     margin: 0;
+}
+
+.switch-button{
+    left: 20%;
 }
 
 

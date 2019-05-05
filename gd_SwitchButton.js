@@ -1,105 +1,121 @@
 
-var valid = ("1234567890").split("");
-function gd_SwitchButton(width = 150){
+let c = document.getElementById("c");
 
-        let height = "calc("+width+" / 3)";
-
-        let SW_BUTTON = document.createElement("div");
-
-        SW_BUTTON.__active = false;
-        SW_BUTTON.innerHTML = "<div></div><div></div><div class='indicator'></div>";
-        SW_BUTTON.className = "switch-button";
-        SW_BUTTON._indicator = SW_BUTTON.querySelector(".indicator");
-        /*SW_BUTTON.style.width = width;
-        SW_BUTTON.style.height = height;*/
-
-        setStyle(SW_BUTTON, width);
-        
-        SW_BUTTON.addEventListener("click", () => {
-            SW_BUTTON.__active = !SW_BUTTON.__active;
-            SW_BUTTON.classList.toggle("active");
-            
-            if(SW_BUTTON.__active){
-                SW_BUTTON._indicator.style.left = SW_BUTTON._indicator._style.active.left;
-                SW_BUTTON._indicator.style.transform = SW_BUTTON._indicator._style.active.transform;
-            }
-            else{
-                SW_BUTTON._indicator.style.left = SW_BUTTON._indicator._style.inactive.left;
-                SW_BUTTON._indicator.style.transform = SW_BUTTON._indicator._style.inactive.transform;
-            }
-        } );
-
-        return SW_BUTTON;
-    }
-
-document.addEventListener("readystatechange", function(){
-    if(document.readyState === "complete"){
-        let style = document.createElement("style");
-        style.innerHTML = STYLE;
-
-        document.head.appendChild(style);
-    }
-});
-
-
-function setStyle(button,  width){
-    let childWidth = width / 3;
-    button.style.borderLeft = 0;
-    button.style.borderRight = 0;
-    button.style.boxSizing = "border-box";
-    button.style.width = width + "px";
-    button.style.height = childWidth + "px";
-    button.style.display  = "inline-block";
-    
-
-    let childs = button.querySelectorAll("div");
-    let indicatorMultiplier = 0.9;
-    childs.forEach((child, index) => {
-        child.style.border = 0;
-        child.style.boxSizing = "border-box";
-        child.style.width = childWidth + "px";
-        child.style.height = childWidth + "px";
-        child.style.display  = "inline-block";
-        child.style.position = "absolute";
-        child.style.top = "calc(50% - "+childWidth/2+"px)";
-        child.style.borderRadius = "50%";
-        if(index == 0)
-            child.style.left = -childWidth / 2 + "px";
-        else if(index == 1)
-            child.style.right = -childWidth / 2 + "px";
-        else{
-            child.style.left = -childWidth / 2 *indicatorMultiplier + "px";
-            child.style.width = childWidth * indicatorMultiplier  + "px";
-            child.style.height = childWidth * indicatorMultiplier  + "px";
-            child.style.top = "calc(50% - "+indicatorMultiplier *childWidth/2+"px)";
-            child._style = {
-                active : {
-                    left: width - childWidth / 2 *indicatorMultiplier  + "px",
-                    transform: "rotate(360deg)",
-                },
-                inactive : {
-                    left: -childWidth / 2 *indicatorMultiplier  + "px",
-                    transform: "rotate(0deg)",
-                },
-            }
+class sb{
+    constructor(buttonSize = 1, container){
+        if(isNaN(buttonSize)){
+            throw new Error("buttonSize is not a number");
         }
-    });
-    
+        if( (container instanceof HTMLElement)){
+            this.dom_container = container;
+        }
+        else{
+            this.dom_container = null;
+        }
+
+        this.mainContainer = document.createElement("div");
+        /**
+         */
+        this.mainContainer.className = "mainContainer";
+         /* 
+         */
+        this.mainContainer.style.width = "100%";
+        this.mainContainer.style.height = "100%";
+        this.mainContainer.style.position = "relative";
+
+        this.makeButtonContainer();
+        this.mainContainer.appendChild(this.buttonContainer);
+        if(this.dom_container){
+            console.log("mount call");
+            this.mount();
+            console.log("mount called");
+        }
+
+    }
+
+    makeButtonContainer(){
+        this.buttonContainer = document.createElement("div");
+        this.buttonContainer.style.height = "100%";
+        this.buttonContainer.style.position = "absolute";
+        this.buttonContainer.style.top = "0";
+        this.buttonContainer.style.zIndex = "1";
+        this.buttonContainer.style.borderLeft = 0;
+        this.buttonContainer.style.borderRight = 0;
+
+        this.buttonContainerSides = [];
+        let side;
+        for(let i = 0; i < 2; ++i){
+            side = document.createElement("div");
+            side.style.borderRadius = "50%";
+            side.style.position = "absolute";
+            side.style.height = "100%";
+            side.style.zIndex = "0";
+            if(i == 0)
+                side.style.left = 0;
+            else
+                side.style.right = 0;
+            this.buttonContainerSides.push(side);
+            this.mainContainer.appendChild(side);
+        }
+
+        this.button = document.createElement("div");
+        this.button.style.position = "absolute";
+        this.button.style.top = "0";
+
+        this.buttonContainer.appendChild(this.button);
+    }
+    mount(){
+
+        let observer = new MutationObserver((mutationList, observer) => {
+            mutationList.forEach(mutation => {
+                console.log("dom_container mutation observed");
+                if(mutation.type == "childList"){
+                    console.log("mutation type == 'childList'");
+                    let length = mutation.addedNodes.length;
+                    console.log("this.buttonContainer :  " + this.mainContainer);
+                    for(let i = 0; i < length; ++i){
+                        console.log("ADDED NODE : " + mutation.addedNodes[i]);
+                        if(mutation.addedNodes[i] === this.mainContainer){
+                            console.log("mutation.addedNodes[i] === this.buttonContainer");
+                            this.fixStyle();
+                            observer.disconnect();
+                            console.log("mutation obsever disconnect");
+                            break;
+                        }
+                    }
+                }
+            });
+
+        }) ;
+
+        observer.observe(this.dom_container,{childList: true});
+        this.dom_container.appendChild(this.mainContainer);
+    }
+
+    fixStyle(){
+        let buttonContainerStyle = window.getComputedStyle(this.buttonContainer);
+        let height = this.buttonContainer.offsetHeight;
+
+        this.buttonContainer.style.width = this.mainContainer.offsetWidth - height + "px";
+        this.buttonContainer.style.left = height / 2 + "px";
+        
+        let b_top = buttonContainerStyle.getPropertyValue("border-top-width");
+        let b_top_color = buttonContainerStyle.getPropertyValue("border-top-color");
+        let b_top_style = buttonContainerStyle.getPropertyValue("border-top-style");
+
+        let borderWidth = b_top.substring(0,b_top.length - 2);
+
+        console.log(borderWidth);
+        this.buttonContainer.style.top = -borderWidth + "px";
+
+        let length = this.buttonContainerSides.length;
+        let side;
+        for(let i = 0; i < length; ++i){
+            side = this.buttonContainerSides[i];
+            side.style.width = height;
+            side.style.top = -borderWidth + "px";
+            side.style.border = borderWidth + "px " +  b_top_style + " " + b_top_color;
+        }
+        console.log("STYLE FIXED");
+    }
 }
-var STYLE = `
-.switch-button{
-    position: relative;
-    top: 150px;
-    left: 150px;
-background-color: rgba(0,0,0,1);
-}
-.switch-button > div{
-    background-color: inherit;
-}
-.switch-button > .indicator{
-    background-color: blue;
-    background: rgb(0,86,154);
-    background: linear-gradient(45deg, rgba(0,86,154,1) 0%, rgba(0,219,255,1) 100%);
-    transition: left linear 2.25s, transform linear 2.25s;
-}
-`;
