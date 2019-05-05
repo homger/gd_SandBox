@@ -31,6 +31,8 @@ class sb{
             console.log("mount called");
         }
 
+        this.isOpen = false;
+        this.addEvents();
     }
 
     makeButtonContainer(){
@@ -41,6 +43,10 @@ class sb{
         this.buttonContainer.style.zIndex = "1";
         this.buttonContainer.style.borderLeft = 0;
         this.buttonContainer.style.borderRight = 0;
+
+        //
+        this.buttonContainer.style.border = 0;
+        //
 
         this.buttonContainerSides = [];
         let side;
@@ -55,12 +61,15 @@ class sb{
             else
                 side.style.right = 0;
             this.buttonContainerSides.push(side);
-            this.mainContainer.appendChild(side);
+            this.buttonContainer.appendChild(side);
         }
 
         this.button = document.createElement("div");
         this.button.style.position = "absolute";
         this.button.style.borderRadius = "50%";
+        this.button.style.zIndex = "2";
+        this.button.style.transitionProperty = "left";
+        this.button.style.transition = "linear 0.3s";
 
         this.buttonContainer.appendChild(this.button);
     }
@@ -118,7 +127,42 @@ class sb{
         }
         this.button.style.height = height - borderWidth*2;
         this.button.style.width = height - borderWidth*2;
-        this.button._active
+        
+        this._closeData = {
+            button:{
+                left: 0,
+            }
+        }
+        this._openData = {
+            button:{
+                left: "calc(100% - "+height+"px)",
+            }
+        }
+        this.close();
+        //this.button.style.left = this._closeData.button.left;
         console.log("STYLE FIXED");
+    }
+
+    addEvents(){
+        this.click = this.click.bind(this);
+
+        this.buttonContainer.addEventListener("click", this.click);
+    }
+
+    open(){
+        this.button.style.left = this._openData.button.left;
+    }
+
+    close(){
+        this.button.style.left = this._closeData.button.left;
+    }
+    click(){
+        if(this.isOpen){
+                this.close();
+            this.isOpen = false;
+            return;
+        }
+        this.open();
+        this.isOpen = true;
     }
 }
