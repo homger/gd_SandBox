@@ -183,15 +183,15 @@ function is_gd_sandbox_folder(folder){
 }
 
 function _folderFromFolderData(folderData){
-    let cach;
+    let folder_cach;
     let filesMap = new Map();
     let foldersMap = new Map();
     folderData.files.forEach(file => filesMap.set(file.name, _fileFromFileData(file)) );
     
     folderData.folders.forEach(folder => foldersMap.set(folder.name, _folderFromFolderData(folder)));
 
-    cach = new _gd_sandbox_folder(folderData.name, folderData.path, 
+    folder_cach = new _gd_sandbox_folder(folderData.name, folderData.path, 
         filesMap, foldersMap, folderData.creationDate, folderData.lastModified);
     ;
-    return cach;
+    return folder_cach;
 }
