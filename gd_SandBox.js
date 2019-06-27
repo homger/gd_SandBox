@@ -29,8 +29,13 @@ class gd_SandBox{
         container.appendChild(this.container);
         
         let files = [];
-        files.push(new _gd_sandbox_file("ONE", "text/js","LOLMDR TROLOLO"));
+        files.push(new _gd_sandbox_file("ONE", "text/js",`
+        document.getElementById('b').onclick = () => alert("MARCHE");
+        
+        `));
+        files.push(new _gd_sandbox_file("TWO", "text/html","<span>TEST</span><button id='b'>B</button>"));
         let editors = [];
+        editors.push(new _gd_sandbox_editor());
         editors.push(new _gd_sandbox_editor());
         
         this.container.querySelector(".edit-section").appendChild(editors[0]._textArea);
@@ -39,9 +44,9 @@ class gd_SandBox{
         viewer.style.backgroundColor = "white";
         d.appendChild(viewer);
         
-        viewer.setDocument(files[0].content);
+        viewer.setDocument(files[1].content + "<script>" +files[0].content+"</script>");
         editors[0]._textArea.addEventListener("keyup", function(){
-            viewer.setDocument(files[0].content);
+            viewer.setDocument(files[1].content + "<script>" +files[0].content+"</script>");
         });
         let ww = new __gd_window(d, this.container.querySelector("section"));
 

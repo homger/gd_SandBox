@@ -3,7 +3,7 @@
 
 
 
-function _gd_sandbox_viewer(){
+function _gd_sandbox_viewer(className, id){
     let iframe = document.createElement("iframe");
     iframe.setDocument = function(content = ""){
         console.log(typeof this.srcdoc);
@@ -17,6 +17,8 @@ function _gd_sandbox_viewer(){
         }
     }
 
+    iframe.className = className;
+    iframe.id = id;
     return iframe;
 }
 

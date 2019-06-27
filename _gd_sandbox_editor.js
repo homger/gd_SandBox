@@ -10,7 +10,18 @@ class _gd_sandbox_editor{
             console.log(this._file.fileData);
         }.bind(this));
     }
-
+    set className(className){
+        this._textArea.className = className;
+    }
+    get className(){
+        return this._textArea.className;
+    }
+    set id(id){
+        this._textArea.id = id;
+    }
+    get id(){
+        return this._textArea.id;
+    }
     set file(file){
         //_gd_sandbox_file_isValid(file);
         if(!is_gd_sandbox_file(file)){
