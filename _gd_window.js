@@ -1,11 +1,13 @@
 'use strict';
 
 
-class __gd_window{
+class _gd_window{
     constructor(htmlBlockElementToMove, boundingBlock = document.body,
         default_z_index = -1, moving_z_index = 0){
 
-            
+            this.size_full_className = "size-full";
+            this.size_half_className = "size-half";
+            this.size_min_className = "size-min";
             /*if(!parentTest(boundingBlock, html)){
                 throw new Error("!boundingBlock.childNodes.includes(htmlBlockElementToMove) === false");
             }*/
@@ -69,6 +71,7 @@ class __gd_window{
     mouseMove(event){
         this.top = event.pageY - this._mouseDownPositionY;
         this.left = event.pageX - this._mouseDownPositionX;
+        console.log("minY :  " + this.minY + "      minX :  "  + this.minX);
         this.setPosition();
     }
     mouseDown(event){
@@ -93,6 +96,7 @@ class __gd_window{
             this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth * 0.25 + "px";
             this.htmlBlockElementToMove.position = "absolute";
             this.refreshGeometry();
+            this.setPosition();
         }
     }
     size_half(){
@@ -103,6 +107,7 @@ class __gd_window{
             this.htmlBlockElementToMove.style.height =  this.boundingBlock.offsetHeight + "px";
             this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth * 0.5 + "px";
             this.refreshGeometry();
+            this.setPosition();
         }
     }
     size_full(){
@@ -113,6 +118,7 @@ class __gd_window{
             this.htmlBlockElementToMove.style.height =  this.boundingBlock.offsetHeight + "px";
             this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth + "px";
             this.refreshGeometry();
+            this.setPosition();
         }
     }
 
@@ -120,6 +126,7 @@ class __gd_window{
         let cach = [this.size_full, this.size_half, this.size_min];
         this.controlPanel = document.createElement("div");
         this.controlPanel.classList = "control-panel";
+        this.controlPanel.style.boxSizing = "border-box";
         /*this.controlPanel.innerHTML =  `
             <div onclick=${() => this.size_full()}></div>
             <div onclick=${() => this.size_half()}></div>
@@ -128,9 +135,18 @@ class __gd_window{
         cach.forEach(element => {
             let _cach = document.createElement("div");
             _cach.onclick = element.bind(this);
+            _cach.style.boxSizing = "border-box";
             this.controlPanel.appendChild(_cach);
         });
+
+        this.setControlClassName();        
+            
         this.movingDiv.appendChild(this.controlPanel);
+    }
+    setControlClassName(){
+        this.controlPanel.childNodes[0].className = this.size_full_className;
+        this.controlPanel.childNodes[1].className = this.size_half_className;
+        this.controlPanel.childNodes[2].className = this.size_min_className;
     }
     elementValidation(htmlBlockElementToMove){
         if(!(htmlBlockElementToMove.parentNode.nodeName === document.body.nodeName)){
@@ -144,6 +160,11 @@ class __gd_window{
 
         });
         this.moving_z_index = cachZindex > this.moving_z_index ? cachZindex : this.moving_z_index;
+
+        console.log("htmlBlockElementToMove z-index: " + 
+        window.getComputedStyle(htmlBlockElementToMove).getPropertyValue("z-index"));
+        if(isNaN(window.getComputedStyle(htmlBlockElementToMove).getPropertyValue("z-index")))
+            htmlBlockElementToMove.style.zIndex = "0";
     }
     setPosition(){
         this.limitTopLeft();
@@ -159,6 +180,8 @@ class __gd_window{
         this.movingDiv.style.left = "0";
         this.movingDiv.style.width = "100%";
         this.movingDiv.style.height = "100%";
+        this.movingDiv.style.margin = "0";
+        this.movingDiv.style.padding = "0";
         this.movingDiv.style.zIndex = this.default_z_index;
         this.htmlBlockElementToMove.style.position = "absolute";
     }
@@ -167,6 +190,17 @@ class __gd_window{
             this.htmlBlockElementToMove.style.height = this.boundingBlock.offsetHeight + "px";
         if(this.htmlBlockElementToMove.offsetWidth > this.boundingBlock.offsetWidth)
             this.htmlBlockElementToMove.style.width = this.boundingBlock.offsetWidth + "px";
+    }
+
+    setSizeClassName( {full, half, min}  ){
+        if(typeof full === "string")
+            this.size_full_className = full;
+        if(typeof half === "string")
+            this.size_half_className = half;
+        if(typeof min === "string")
+            this.size_min_className = min;
+
+            this.setControlClassName();
     }
 }
 function get_offsetXY(element){

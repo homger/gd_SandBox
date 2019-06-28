@@ -48,7 +48,7 @@ class gd_SandBox{
         editors[0]._textArea.addEventListener("keyup", function(){
             viewer.setDocument(files[1].content + "<script>" +files[0].content+"</script>");
         });
-        let ww = new __gd_window(d, this.container.querySelector("section"));
+        let ww = new _gd_window(d, this.container.querySelector("section"));
 
         //this.container.querySelector(".edit-section").appendChild(d)
         /*ww.size_half();
