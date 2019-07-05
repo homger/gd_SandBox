@@ -1,105 +1,120 @@
 'use strict';
-var STYLE_MOUNTED = false;
 
 class gd_SandBox{
-    constructor(container, data){
-        this.container = document.createElement("main");
-        //this.setupLayout();
-        this.container.innerHTML = `
-        <header>
-            <div>
-            </div>
-            <div class="control">
-            </div>
-        </header>
-        <nav></nav>
-        <section class="edit-section">
-            <header></header>
-        </section>
-        <footer></footer>
-        `;
-        //this.container.querySelector("header .control").appendChild(gd_SwitchButton("150px"));
-        let d = document.createElement("section");
-        d.className = "view-section";
-        let iframe = document.createElement("iframe");
-        iframe.src = "w";
-        
-        this.container.className ="cc";
-        document.body.appendChild(d);
-        container.appendChild(this.container);
-        
-        let files = [];
-        files.push(new _gd_sandbox_file("ONE", "text/js",`
-        document.getElementById('b').onclick = () => alert("MARCHE");
-        
-        `));
-        files.push(new _gd_sandbox_file("TWO", "text/html","<span>TEST</span><button id='b'>B</button>"));
-        let editors = [];
-        editors.push(new _gd_sandbox_editor());
-        editors.push(new _gd_sandbox_editor());
-        
-        this.container.querySelector(".edit-section").appendChild(editors[0]._textArea);
-        editors[0].setFile(files[0]);
-        let viewer = _gd_sandbox_viewer();
-        viewer.style.backgroundColor = "white";
-        d.appendChild(viewer);
-        
-        viewer.setDocument(files[1].content + "<script>" +files[0].content+"</script>");
-        editors[0]._textArea.addEventListener("keyup", function(){
-            viewer.setDocument(files[1].content + "<script>" +files[0].content+"</script>");
-        });
-        let ww = new _gd_window(d, this.container.querySelector("section"));
-
-        //this.container.querySelector(".edit-section").appendChild(d)
-        /*ww.size_half();
-        ww.size_full();
-        ww.size_half();*/
-        //test(d);
-        this.setupLayout();
-    }
-
-    setupLayout(){
-        this.container.querySelector(".control").appendChild(
-            gd_SwitchButton(() => {},25)
-        );
-    }
-}
-function test(_div){
-    let d = document.querySelector(".view-section");
-    let c = d;
-    console.log(c.offsetLeft + " " + c.offsetTop +" __node name:" + c.nodeName);
-    let i = 0;
-    let left = 0;
-    let top = 0;
-    let a = c;
-    do{
-        /*if(i==1){
-            let a = c;
-            setTimeout(() => {
-                console.log("GONA DO");
-                console.log(a.offsetTop);
-                a.style.left = 0 + "px";
-                a.style.top = 0 + "px";
-
-            }, 1000);
-        }*/
-        if(c.offsetLeft !== undefined){
-            left += c.offsetLeft;
-            top += c.offsetTop;
+    constructor(container, parameters){
+        let arguments_valid = _argumentsCheck(container, parameters);
+        if(!arguments_valid.valid){
+            console.log(arguments_valid.elements);
+            throw new Error("args are invalid");
         }
-        c = c.parentNode;
-        console.log(c.offsetLeft + " " + c.offsetTop +" __node name:" + c.nodeName);
-        ++i;
-    }while(c.offsetLeft !== undefined);
+        console.log(arguments_valid.elements);
+        this.initialSetUp(container, parameters);
+        
 
-    setTimeout(() => {
-        console.log("GONA DO");
-        console.log(a.offsetTop);
+    }
 
-        a.style.position = "fixed";
-        a.style.right = left - a.clientWidth  + "px";
-        a.style.bottom = top - a.clientHeight + "px";
+    initialSetUp(container, parameters){
+        this.main_container = document.createElement("main");
+        _layoutSetUp(this);
 
-    }, 1000);
-    
+        container.append(this.main_container);
+    }
 }
+
+function _argumentsCheck(container, parameters){
+    let data_object = {valid : true, elements : []}; //...
+    
+    data_object.elements.push = ["container",(container instanceof HTMLElement)];
+    let length = data_object.elements.length;
+    for(let i = 0; i < length; ++i){
+        if(!data_object.elements[i][1]){
+            data_object.valid = false;
+            return data_object;
+        }
+    }
+    
+    return data_object;
+}
+
+function _layoutSetUp(sandbox){
+    sandbox.main_container.className = "gd_SandBox";
+    let nav = document.createElement("nav");
+    let header = document.createElement("header");
+    let working_section = document.createElement("section");
+    let footer = document.createElement("footer");
+
+    sandbox.gui_elements = [];
+    sandbox.gui_elements["nav"] = nav;
+    sandbox.gui_elements["header"] = header;
+    sandbox.gui_elements["working_section"] = working_section;
+    sandbox.gui_elements["footer"] = footer;
+
+    sandbox.gui_elements.forEach(function(element){
+        element.className = "gd_SandBox_gui_element";
+        sandbox.main_container.append(element);
+    });
+
+
+
+}
+
+
+
+
+
+document.addEventListener("readystatechange", function(){
+    if(document.readyState === "complete"){
+        let style = document.createElement("style");
+        style.innerHTML = DEFAULT_STYLE;
+
+        document.head.append(style);
+    }
+});
+
+
+
+var DEFAULT_STYLE = [
+    `
+    .gd_SandBox{
+        position: relative;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    .gd_SandBox *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    .gd_SandBox_gui_element{
+        position: absolute;
+        border: 2px solid red;
+    }
+    .gd_SandBox > header{
+        top:0;
+        left:0;
+        height: 10%;
+        width; 100%;
+    }
+    .gd_SandBox > nav{
+        top:10%;
+        left:0;
+        height: 85%;
+        width; 15%;
+    }
+    .gd_SandBox > section{
+        top:10%;
+        left:15%;
+        height: 85%;
+        width; 85%;
+    }
+    .gd_SandBox > footer{
+        top:95%;
+        left:0;
+        height: 5%;
+        width; 100%;
+    }
+    `,
+];

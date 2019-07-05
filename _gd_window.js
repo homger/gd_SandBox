@@ -1,5 +1,6 @@
 'use strict';
 
+var GD_WINDOW_LIST = [];
 
 class _gd_window{
     constructor(htmlBlockElementToMove, boundingBlock = document.body,
@@ -11,10 +12,10 @@ class _gd_window{
             /*if(!parentTest(boundingBlock, html)){
                 throw new Error("!boundingBlock.childNodes.includes(htmlBlockElementToMove) === false");
             }*/
-            this.elementValidation(htmlBlockElementToMove);
             this.movingDiv = document.createElement("div");
             this.default_z_index = default_z_index;
             this.moving_z_index = moving_z_index;
+            this.elementValidation(htmlBlockElementToMove);
 
             this.top = 0, this.left = 0, this.boundingBlock = boundingBlock, 
             this.htmlBlockElementToMove = htmlBlockElementToMove, this._size = "mini";
@@ -41,6 +42,7 @@ class _gd_window{
                 this.setPosition();
             });
             
+            GD_WINDOW_LIST.push(this);
             this.mountControls();
     }
 
@@ -96,6 +98,7 @@ class _gd_window{
             this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth * 0.25 + "px";
             this.htmlBlockElementToMove.position = "absolute";
             this.refreshGeometry();
+            this.sizeCheck();
             this.setPosition();
         }
     }
@@ -107,6 +110,7 @@ class _gd_window{
             this.htmlBlockElementToMove.style.height =  this.boundingBlock.offsetHeight + "px";
             this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth * 0.5 + "px";
             this.refreshGeometry();
+            this.sizeCheck();
             this.setPosition();
         }
     }
@@ -118,6 +122,7 @@ class _gd_window{
             this.htmlBlockElementToMove.style.height =  this.boundingBlock.offsetHeight + "px";
             this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth + "px";
             this.refreshGeometry();
+            this.sizeCheck();
             this.setPosition();
         }
     }
@@ -149,6 +154,7 @@ class _gd_window{
         this.controlPanel.childNodes[2].className = this.size_min_className;
     }
     elementValidation(htmlBlockElementToMove){
+        console.log("this.moving_z_index :  " + this.moving_z_index);
         if(!(htmlBlockElementToMove.parentNode.nodeName === document.body.nodeName)){
             throw new Error("htmlBlockElementToMove is not direct child of document.body");
         }
@@ -156,11 +162,14 @@ class _gd_window{
         let cachZindex;
         htmlBlockElementToMove.childNodes.forEach(child =>{
             cachZindex = window.getComputedStyle(child).getPropertyValue("z-index");
-            zIndex = cachZindex > zIndex ? cachZindex : zIndex ; 
+            console.log(cachZindex);
+            if(!isNaN(cachZindex))
+            zIndex = cachZindex > zIndex ? cachZindex : zIndex ;
 
         });
-        this.moving_z_index = cachZindex > this.moving_z_index ? cachZindex : this.moving_z_index;
-
+        if(zIndex > this.moving_z_index)
+            this.moving_z_index = zIndex;
+        console.log("this.moving_z_index :  " + this.moving_z_index);
         console.log("htmlBlockElementToMove z-index: " + 
         window.getComputedStyle(htmlBlockElementToMove).getPropertyValue("z-index"));
         if(isNaN(window.getComputedStyle(htmlBlockElementToMove).getPropertyValue("z-index")))
@@ -184,6 +193,7 @@ class _gd_window{
         this.movingDiv.style.padding = "0";
         this.movingDiv.style.zIndex = this.default_z_index;
         this.htmlBlockElementToMove.style.position = "absolute";
+        this.htmlBlockElementToMove.style.boxSizing = "border-box";
     }
     sizeCheck(){
         if(this.htmlBlockElementToMove.offsetHeight > this.boundingBlock.offsetHeight)
