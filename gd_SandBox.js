@@ -7,7 +7,7 @@ class gd_SandBox{
             console.log(arguments_valid.elements);
             throw new Error("args are invalid");
         }
-        console.log(arguments_valid.elements);
+        console.log(arguments_valid);
         this.initialSetUp(container, parameters);
         
 
@@ -16,15 +16,26 @@ class gd_SandBox{
     initialSetUp(container, parameters){
         this.main_container = document.createElement("main");
         _layoutSetUp(this);
+        _m_var_setup(this);
 
         container.append(this.main_container);
     }
+
+    newProject(name){
+        if(!(typeof name == "string")){
+            name = "N/A";
+        }
+        this.projectsList.push([name, new _gd_sandbox_project(name)]);
+    }
+
+
+
 }
 
 function _argumentsCheck(container, parameters){
     let data_object = {valid : true, elements : []}; //...
     
-    data_object.elements.push = ["container",(container instanceof HTMLElement)];
+    data_object.elements.push(["container",(container instanceof HTMLElement)]);
     let length = data_object.elements.length;
     for(let i = 0; i < length; ++i){
         if(!data_object.elements[i][1]){
@@ -43,19 +54,20 @@ function _layoutSetUp(sandbox){
     let working_section = document.createElement("section");
     let footer = document.createElement("footer");
 
-    sandbox.gui_elements = [];
-    sandbox.gui_elements["nav"] = nav;
+    sandbox.gui_elements = [nav, header, working_section, footer];
+    /*sandbox.gui_elements["nav"] = nav;
     sandbox.gui_elements["header"] = header;
     sandbox.gui_elements["working_section"] = working_section;
-    sandbox.gui_elements["footer"] = footer;
+    sandbox.gui_elements["footer"] = footer;*/
 
     sandbox.gui_elements.forEach(function(element){
         element.className = "gd_SandBox_gui_element";
         sandbox.main_container.append(element);
     });
+}
 
-
-
+function _m_var_setup(sandbox){
+    sandbox.projectsList = [];
 }
 
 
@@ -90,31 +102,31 @@ var DEFAULT_STYLE = [
     }
     .gd_SandBox_gui_element{
         position: absolute;
-        border: 2px solid red;
+        border: 1px solid red;
     }
     .gd_SandBox > header{
         top:0;
         left:0;
         height: 10%;
-        width; 100%;
+        width: 100%;
     }
     .gd_SandBox > nav{
         top:10%;
         left:0;
         height: 85%;
-        width; 15%;
+        width: 15%;
     }
     .gd_SandBox > section{
         top:10%;
         left:15%;
         height: 85%;
-        width; 85%;
+        width: 85%;
     }
     .gd_SandBox > footer{
         top:95%;
         left:0;
         height: 5%;
-        width; 100%;
+        width: 100%;
     }
     `,
 ];
