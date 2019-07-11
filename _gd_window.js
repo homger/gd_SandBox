@@ -1,11 +1,26 @@
 'use strict';
 
 var GD_WINDOW_LIST = [];
-
+var DEFAULLT_PARAMETERS = {
+  boundingBlock: document.body,
+  default_z_index: -1,
+  moving_z_index: 0,
+  sizeMin: {
+    w: "25%",
+    h: "25%",
+  },
+  sizeHalf: {
+    w: "50%",
+    h: "50%",
+  },
+  sizeFull: {
+    w: "100%",
+    h: "100%",
+  },
+}
 class _gd_window{
-    constructor(htmlBlockElementToMove, boundingBlock = document.body,
-        default_z_index = -1, moving_z_index = 0){
-
+    constructor(htmlBlockElementToMove, parameters){
+            objectDefaultValue(parameters, DEFAULLT_PARAMETERS);
             this.size_full_className = "size-full";
             this.size_half_className = "size-half";
             this.size_min_className = "size-min";
@@ -13,11 +28,11 @@ class _gd_window{
                 throw new Error("!boundingBlock.childNodes.includes(htmlBlockElementToMove) === false");
             }*/
             this.movingDiv = document.createElement("div");
-            this.default_z_index = default_z_index;
-            this.moving_z_index = moving_z_index;
+            this.default_z_index = parameters.default_z_index;
+            this.moving_z_index = parameters.moving_z_index;
             this.elementValidation(htmlBlockElementToMove);
 
-            this.top = 0, this.left = 0, this.boundingBlock = boundingBlock, 
+            this.top = 0, this.left = 0, this.boundingBlock = parameters.boundingBlock, 
             this.htmlBlockElementToMove = htmlBlockElementToMove, this._size = "mini";
             
             this._mouseDownPositionX = 0;
@@ -233,4 +248,17 @@ function get_offsetXY(element){
         top,
         left,
     }
+}
+
+
+function objectDefaultValue(objectToCheck, defaultObject){
+  if(typeof defaultObject !== "object"){
+    throw new Error("(typeof defaultObject !== 'object') == true");
+  }
+  let keyArray = Object.keys(defaultObject);
+  keyArray.forEach(function(key){
+    if(typeof objectToCheck[key] !== typeof defaultObject[key]){
+      objectToCheck[key] = defaultObject[key];
+    }
+  });
 }
