@@ -161,11 +161,12 @@ class _gd_window{
         let zIndex = 1;
         let cachZindex;
         htmlBlockElementToMove.childNodes.forEach(child =>{
+          if((child instanceof Element)){
             cachZindex = window.getComputedStyle(child).getPropertyValue("z-index");
             console.log(cachZindex);
             if(!isNaN(cachZindex))
             zIndex = cachZindex > zIndex ? cachZindex : zIndex ;
-
+          }
         });
         if(zIndex > this.moving_z_index)
             this.moving_z_index = zIndex;
