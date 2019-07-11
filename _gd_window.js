@@ -17,10 +17,12 @@ var DEFAULLT_PARAMETERS = {
     w: "100%",
     h: "100%",
   },
+  controlPanelPadding: true,
 }
 class _gd_window{
-    constructor(htmlBlockElementToMove, parameters){
+    constructor(htmlBlockElementToMove, parameters = DEFAULLT_PARAMETERS){
             objectDefaultValue(parameters, DEFAULLT_PARAMETERS);
+            this.parameters = parameters;
             this.size_full_className = "size-full";
             this.size_half_className = "size-half";
             this.size_min_className = "size-min";
@@ -92,12 +94,14 @@ class _gd_window{
         this.setPosition();
     }
     mouseDown(event){
-        event.preventDefault();
-        this._mouseDownPositionX = event.offsetX;
-        this._mouseDownPositionY = event.offsetY;
-        this.movingDiv.style.zIndex = this.moving_z_index;
-        window.addEventListener("mousemove", this.mouseMove);
-        window.addEventListener("mouseup", this.mouseUp);
+        if(event.target === this.controlPanel){//event.target === this.movingDiv){
+          event.preventDefault();
+          this._mouseDownPositionX = event.offsetX;
+          this._mouseDownPositionY = event.offsetY;
+          this.movingDiv.style.zIndex = this.moving_z_index;
+          window.addEventListener("mousemove", this.mouseMove);
+          window.addEventListener("mouseup", this.mouseUp);
+        }
     }
     mouseUp(){
         this.movingDiv.style.zIndex = this.default_z_index;
@@ -109,8 +113,8 @@ class _gd_window{
         if(this._size != "mini"){
             this._size = "mini";
             this.movingDiv.addEventListener("mousedown", this.mouseDown);
-            this.htmlBlockElementToMove.style.height = this.boundingBlock.offsetHeight * 0.25 + "px";
-            this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth * 0.25 + "px";
+            this.htmlBlockElementToMove.style.height = this.parameters.sizeMin.h;
+            this.htmlBlockElementToMove.style.width =  this.parameters.sizeMin.w;
             this.htmlBlockElementToMove.position = "absolute";
             this.refreshGeometry();
             this.sizeCheck();
@@ -122,8 +126,8 @@ class _gd_window{
             /*if(this._size == "mini")
                 this.movingDiv.removeEventListener("mousedown", this.mouseDown);*/
             this._size = "half";
-            this.htmlBlockElementToMove.style.height =  this.boundingBlock.offsetHeight + "px";
-            this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth * 0.5 + "px";
+            this.htmlBlockElementToMove.style.height =  this.parameters.sizeHalf.h;
+            this.htmlBlockElementToMove.style.width =  this.parameters.sizeHalf.w;
             this.refreshGeometry();
             this.sizeCheck();
             this.setPosition();
@@ -134,8 +138,8 @@ class _gd_window{
             /*if(this._size == "mini")
                 this.movingDiv.removeEventListener("mousedown", this.mouseDown);*/
             this._size = "full";
-            this.htmlBlockElementToMove.style.height =  this.boundingBlock.offsetHeight + "px";
-            this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth + "px";
+            this.htmlBlockElementToMove.style.height =  this.parameters.sizeFull.h;
+            this.htmlBlockElementToMove.style.width =  this.parameters.sizeFull.w;
             this.refreshGeometry();
             this.sizeCheck();
             this.setPosition();
@@ -211,7 +215,7 @@ class _gd_window{
         this.htmlBlockElementToMove.style.position = "absolute";
         this.htmlBlockElementToMove.style.boxSizing = "border-box";
         
-        if(true){
+        if(this.parameters.controlPanelPadding){
           this.htmlBlockElementToMove.style.paddingTop = "50px";
         }
     }
