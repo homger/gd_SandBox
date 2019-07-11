@@ -195,6 +195,10 @@ class _gd_window{
         this.movingDiv.style.zIndex = this.default_z_index;
         this.htmlBlockElementToMove.style.position = "absolute";
         this.htmlBlockElementToMove.style.boxSizing = "border-box";
+        
+        if(true){
+          this.htmlBlockElementToMove.style.paddingTop = "50px";
+        }
     }
     sizeCheck(){
         if(this.htmlBlockElementToMove.offsetHeight > this.boundingBlock.offsetHeight)
