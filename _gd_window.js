@@ -1,11 +1,29 @@
 'use strict';
 
 var GD_WINDOW_LIST = [];
+var DEFAULLT_PARAMETERS = {
+  boundingBlock: document.body,
+  default_z_index: -1,
+  moving_z_index: 0,
+  sizeMin: {
+    w: "25%",
+    h: "25%",
+  },
+  sizeHalf: {
+    w: "50%",
+    h: "50%",
+  },
+  sizeFull: {
+    w: "100%",
+    h: "100%",
+  },
+  controlPanelPadding: true,
+}
 
 class _gd_window{
-    constructor(htmlBlockElementToMove, boundingBlock = document.body,
-        default_z_index = -1, moving_z_index = 0){
-
+    constructor(htmlBlockElementToMove, parameters = DEFAULLT_PARAMETERS){
+            this.parameters = objectDefaultValue(parameters, DEFAULLT_PARAMETERS);
+            
             this.size_full_className = "size-full";
             this.size_half_className = "size-half";
             this.size_min_className = "size-min";
@@ -13,11 +31,11 @@ class _gd_window{
                 throw new Error("!boundingBlock.childNodes.includes(htmlBlockElementToMove) === false");
             }*/
             this.movingDiv = document.createElement("div");
-            this.default_z_index = default_z_index;
-            this.moving_z_index = moving_z_index;
+            this.default_z_index = parameters.default_z_index;
+            this.moving_z_index = parameters.moving_z_index;
             this.elementValidation(htmlBlockElementToMove);
 
-            this.top = 0, this.left = 0, this.boundingBlock = boundingBlock, 
+            this.top = 0, this.left = 0, this.boundingBlock = parameters.boundingBlock, 
             this.htmlBlockElementToMove = htmlBlockElementToMove, this._size = "mini";
             
             this._mouseDownPositionX = 0;
@@ -77,12 +95,14 @@ class _gd_window{
         this.setPosition();
     }
     mouseDown(event){
-        event.preventDefault();
-        this._mouseDownPositionX = event.offsetX;
-        this._mouseDownPositionY = event.offsetY;
-        this.movingDiv.style.zIndex = this.moving_z_index;
-        window.addEventListener("mousemove", this.mouseMove);
-        window.addEventListener("mouseup", this.mouseUp);
+        if(event.target === this.controlPanel){//event.target === this.movingDiv){
+          event.preventDefault();
+          this._mouseDownPositionX = event.offsetX;
+          this._mouseDownPositionY = event.offsetY;
+          this.movingDiv.style.zIndex = this.moving_z_index;
+          window.addEventListener("mousemove", this.mouseMove);
+          window.addEventListener("mouseup", this.mouseUp);
+        }
     }
     mouseUp(){
         this.movingDiv.style.zIndex = this.default_z_index;
@@ -94,8 +114,8 @@ class _gd_window{
         if(this._size != "mini"){
             this._size = "mini";
             this.movingDiv.addEventListener("mousedown", this.mouseDown);
-            this.htmlBlockElementToMove.style.height = this.boundingBlock.offsetHeight * 0.25 + "px";
-            this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth * 0.25 + "px";
+            this.htmlBlockElementToMove.style.height = this.parameters.sizeMin.h;
+            this.htmlBlockElementToMove.style.width =  this.parameters.sizeMin.w;
             this.htmlBlockElementToMove.position = "absolute";
             this.refreshGeometry();
             this.sizeCheck();
@@ -107,8 +127,8 @@ class _gd_window{
             /*if(this._size == "mini")
                 this.movingDiv.removeEventListener("mousedown", this.mouseDown);*/
             this._size = "half";
-            this.htmlBlockElementToMove.style.height =  this.boundingBlock.offsetHeight + "px";
-            this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth * 0.5 + "px";
+            this.htmlBlockElementToMove.style.height =  this.parameters.sizeHalf.h;
+            this.htmlBlockElementToMove.style.width =  this.parameters.sizeHalf.w;
             this.refreshGeometry();
             this.sizeCheck();
             this.setPosition();
@@ -119,8 +139,8 @@ class _gd_window{
             /*if(this._size == "mini")
                 this.movingDiv.removeEventListener("mousedown", this.mouseDown);*/
             this._size = "full";
-            this.htmlBlockElementToMove.style.height =  this.boundingBlock.offsetHeight + "px";
-            this.htmlBlockElementToMove.style.width =  this.boundingBlock.offsetWidth + "px";
+            this.htmlBlockElementToMove.style.height =  this.parameters.sizeFull.h;
+            this.htmlBlockElementToMove.style.width =  this.parameters.sizeFull.w;
             this.refreshGeometry();
             this.sizeCheck();
             this.setPosition();
@@ -195,6 +215,10 @@ class _gd_window{
         this.movingDiv.style.zIndex = this.default_z_index;
         this.htmlBlockElementToMove.style.position = "absolute";
         this.htmlBlockElementToMove.style.boxSizing = "border-box";
+        
+        if(this.parameters.controlPanelPadding){
+          this.htmlBlockElementToMove.style.paddingTop = "50px";
+        }
     }
     sizeCheck(){
         if(this.htmlBlockElementToMove.offsetHeight > this.boundingBlock.offsetHeight)
@@ -229,4 +253,26 @@ function get_offsetXY(element){
         top,
         left,
     }
+}
+
+
+/*
+use Object.freeze on defaultObject
+*/
+function objectDefaultValue(objectToCheck, defaultObject){
+  if(typeof defaultObject !== "object"){
+    throw new Error("Invalid defaultObject argument");
+  }
+  if(typeof objectToCheck !== "object"){
+    console.warn("argument objectToCheck is not an object. defaultObject wil be copied");
+    objectToCheck = {};
+  }
+  
+  let keyArray = Object.keys(defaultObject);
+  keyArray.forEach(function(key){
+    if(typeof objectToCheck[key] !== typeof defaultObject[key]){
+      objectToCheck[key] = defaultObject[key];
+    }
+  });
+  return objectToCheck;
 }
