@@ -1,132 +1,126 @@
 'use strict';
 
+const PARAMETERS_DEFAULT_VALUE = {
+  nav: null,
+  header: null,
+  editor: null,
+  footer: null,
+}
+const UI_ELEMENTS_NAME = ["nav","header","editor","footer"]
+
 class gd_SandBox{
-    constructor(container, parameters){
-        let arguments_valid = _argumentsCheck(container, parameters);
-        if(!arguments_valid.valid){
-            console.log(arguments_valid.elements);
-            throw new Error("args are invalid");
-        }
-        console.log(arguments_valid);
-        this.initialSetUp(container, parameters);
+
+    constructor(parameters = PARAMETERS_DEFAULT_VALUE){
+
+        this.parameters = objectDefaultValue(parameters, PARAMETERS_DEFAULT_VALUE);
         
+        this.projectsList = [];
+        this.initialSetUp();
 
     }
 
-    initialSetUp(container, parameters){
-        this.main_container = document.createElement("main");
-        _layoutSetUp(this);
-        _m_var_setup(this);
+    initialSetUp(){
+      console.log("initialSetUp");
+      UI_ELEMENTS_NAME.forEach(function(name){
+        if(this.parameters[name] !== null){
 
-        container.append(this.main_container);
+          this.parameters[name].innerHTML = "";
+          this[name] = this.parameters[name];
+        }
+      }.bind(this));
+
+      this.nav.innerHTML = "<ul></ul>";
     }
 
     newProject(name){
         if(!(typeof name == "string")){
             name = "N/A";
         }
-        this.projectsList.push([name, new _gd_sandbox_project(name)]);
+        this.projectsList.push(
+          {
+            name: name, 
+            project: new _gd_sandbox_project(name),
+            mounted: false,
+          }
+          );
+          this.mountProjects();
     }
 
-
-
-}
-
-function _argumentsCheck(container, parameters){
-    let data_object = {valid : true, elements : []}; //...
-    
-    data_object.elements.push(["container",(container instanceof HTMLElement)]);
-    let length = data_object.elements.length;
-    for(let i = 0; i < length; ++i){
-        if(!data_object.elements[i][1]){
-            data_object.valid = false;
-            return data_object;
+    mountProjects(){
+      this.projectsList.forEach(function(projectData){
+        if(!projectData.mounted){
+          this.nav.append(ui_project(this.projectsList[0][1].name))
         }
+      }.bind(this));
     }
+
     
-    return data_object;
-}
-
-function _layoutSetUp(sandbox){
-    sandbox.main_container.className = "gd_SandBox";
-    let nav = document.createElement("nav");
-    let header = document.createElement("header");
-    let working_section = document.createElement("section");
-    let footer = document.createElement("footer");
-
-    sandbox.gui_elements = [nav, header, working_section, footer];
-    /*sandbox.gui_elements["nav"] = nav;
-    sandbox.gui_elements["header"] = header;
-    sandbox.gui_elements["working_section"] = working_section;
-    sandbox.gui_elements["footer"] = footer;*/
-
-    sandbox.gui_elements.forEach(function(element){
-        element.className = "gd_SandBox_gui_element";
-        sandbox.main_container.append(element);
-    });
-}
-
-function _m_var_setup(sandbox){
-    sandbox.projectsList = [];
 }
 
 
+/*
+use Object.freeze on defaultObject
+*/
+function objectDefaultValue(objectToCheck, defaultObject){
+  if(typeof defaultObject !== "object"){
+    throw new Error("Invalid defaultObject argument");
+  }
+  if(typeof objectToCheck !== "object"){
+    console.warn("argument objectToCheck is not an object. defaultObject wil be copied");
+    objectToCheck = {};
+  }
+  
+  let keyArray = Object.keys(defaultObject);
+  keyArray.forEach(function(key){
+    if(typeof objectToCheck[key] !== typeof defaultObject[key]){
+      objectToCheck[key] = defaultObject[key];
+    }
+  });
+  return objectToCheck;
+}
 
 
+function ui_project(_gd_project_name){
+  let project = document.createElement("div");
+  project.className = "project";
+  
 
-document.addEventListener("readystatechange", function(){
-    if(document.readyState === "complete"){
-        let style = document.createElement("style");
-        style.innerHTML = DEFAULT_STYLE;
+  project.innerHTML = `<div class="name">${FOLDER_ICON}${_gd_project_name}</div>`;
+  let ul = document.createElement("ul");
+  ul.className = "folder project-content";
+  project.append(ul);
+  return project;
+}
 
-        document.head.append(style);
-    }
-});
+function ui_folder(name, content){
+  let folder = document.createElement("li");
+  folder.className = "folder";
 
+  let ul = document.createElement("ul");
+  ul.className = "folder-content"
+  let ul_content = "";
+  content.folders.forEach(function(folderName){
+    ul_content += `<li class="folder">${folderName}</li>`;
+  });
 
+  ul.innerHTML = ul_content;
 
-var DEFAULT_STYLE = [
-    `
-    .gd_SandBox{
-        position: relative;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    .gd_SandBox *{
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    .gd_SandBox_gui_element{
-        position: absolute;
-        border: 1px solid red;
-    }
-    .gd_SandBox > header{
-        top:0;
-        left:0;
-        height: 10%;
-        width: 100%;
-    }
-    .gd_SandBox > nav{
-        top:10%;
-        left:0;
-        height: 85%;
-        width: 15%;
-    }
-    .gd_SandBox > section{
-        top:10%;
-        left:15%;
-        height: 85%;
-        width: 85%;
-    }
-    .gd_SandBox > footer{
-        top:95%;
-        left:0;
-        height: 5%;
-        width: 100%;
-    }
-    `,
-];
+  content.files.forEach(function(fileName){
+    ul.append(ui_file(fileName));
+  });
+
+  folder.innerHTML = `<div class="name">${FOLDER_ICON}${name}<div>`;
+  folder.appendChild(ul);
+  return folder;
+}
+
+function ui_file(name){
+  
+  let file = document.createElement("li");
+  file.className = "file";
+  
+  file.innerHTML = `
+      <div class="name">${name}</div>
+    `;
+  return file;
+}
