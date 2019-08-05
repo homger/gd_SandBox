@@ -11,10 +11,13 @@ const UI_ELEMENTS_NAME = ["nav","header","editor","footer"]
 class gd_SandBox{
 
     constructor(parameters = PARAMETERS_DEFAULT_VALUE){
+        this.navContextMenu = this.navContextMenu.bind(this);
 
         this.parameters = objectDefaultValue(parameters, PARAMETERS_DEFAULT_VALUE);
         
         this.projectsList = [];
+        this.projectsNameList = [];
+        this.projectCount = 0;
         this.initialSetUp();
 
     }
@@ -36,25 +39,46 @@ class gd_SandBox{
         if(!(typeof name == "string")){
             name = "N/A";
         }
-        this.projectsList.push(
-          {
-            name: name, 
-            project: new _gd_sandbox_project(name),
-            mounted: false,
-          }
-          );
-          this.mountProjects();
+        if(typeof this.projectsNameList[name] === "undefined"){
+          this.projectsNameList[name] = this.projectCount;
+          this.projectsList.push(
+            {
+              name: name, 
+              project: new _gd_sandbox_project(name),
+              mounted: false,
+              ui_project: ui_project(name),
+              index: this.projectCount,
+            }
+            );
+            
+            ++this.projectCount;
+            this.mountProjects();
+        }
     }
 
     mountProjects(){
       this.projectsList.forEach(function(projectData){
         if(!projectData.mounted){
-          this.nav.append(ui_project(this.projectsList[0][1].name))
+          this.nav.append(projectData.ui_project.ui_object);
+          this.events(projectData);
         }
       }.bind(this));
     }
 
-    
+    addFolder(path){
+      
+    }
+
+    events(projectData){
+      console.log("EVENTS");
+      projectData.ui_project.ui_object.addEventListener("contextmenu",this.navContextMenu);
+    }
+
+    navContextMenu(event){
+      console.log(event.screenX);
+      event.preventDefault();
+      
+    }
 }
 
 
@@ -81,46 +105,109 @@ function objectDefaultValue(objectToCheck, defaultObject){
 
 
 function ui_project(_gd_project_name){
-  let project = document.createElement("div");
-  project.className = "project";
+  let ui_object = document.createElement("div");
+  ui_object.className = "project";
   
 
-  project.innerHTML = `<div class="name">${FOLDER_ICON}${_gd_project_name}</div>`;
+  ui_object.innerHTML = `<div class="name">${FOLDER_ICON}${_gd_project_name}</div>`;
   let ul = document.createElement("ul");
   ul.className = "folder project-content";
-  project.append(ul);
+  ui_object.append(ul);
+  
+  let project = new __project(ui_object, ul, name);
   return project;
 }
 
-function ui_folder(name, content){
-  let folder = document.createElement("li");
-  folder.className = "folder";
+function ui_folder(name){
+  let ui_object = document.createElement("li");
+  ui_object.className = "folder";
 
   let ul = document.createElement("ul");
   ul.className = "folder-content"
   let ul_content = "";
-  content.folders.forEach(function(folderName){
-    ul_content += `<li class="folder">${folderName}</li>`;
-  });
 
-  ul.innerHTML = ul_content;
-
-  content.files.forEach(function(fileName){
-    ul.append(ui_file(fileName));
-  });
-
-  folder.innerHTML = `<div class="name">${FOLDER_ICON}${name}<div>`;
-  folder.appendChild(ul);
+  ui_object.innerHTML = `<div class="name">${FOLDER_ICON}${name}<div>`;
+  ui_object.appendChild(ul);
+  
+  let folder = new __folder(ui_object, ul, name);
   return folder;
 }
 
 function ui_file(name){
   
-  let file = document.createElement("li");
-  file.className = "file";
+  let ui_object = document.createElement("li");
+  ui_object.className = "file";
   
-  file.innerHTML = `
+  ui_object.innerHTML = `
       <div class="name">${name}</div>
     `;
+    let file = new __file(name, ui_object);
   return file;
+}
+
+
+class __file{
+  constructor(name, ui_object){
+    this.name = name;
+    this.ui_object = ui_object;
+  }
+
+  setName(name){
+    this.ui_object.querySelector(".name").innerHTML = name;
+    this.name = name;
+  }
+  getName(){
+    return this.name;
+  }
+}
+
+class __folder{
+  
+  constructor(ui_object, ul, name){
+    this.ui_object = ui_object;
+    this.ul = ul;
+    this.name = name;
+  }
+
+  setName(name){
+    this.ui_object.querySelector(".name").innerHTML = name;
+    this.name = name;
+  }
+
+  getName(){
+    return this.name;
+  }
+  
+  addItem(item){
+    this.ul.append(item);
+  }
+  removeItem (item){
+    this.ul.removeChild(item);
+  }
+}
+
+
+class __project{
+  
+  constructor(ui_object, ul, name){
+    this.ui_object = ui_object;
+    this.ul = ul;
+    this.name = name;
+  }
+
+  setName(name){
+    this.ui_object.querySelector(".name").innerHTML = name;
+    this.name = name;
+  }
+
+  getName(){
+    return this.name;
+  }
+  
+  addItem(item){
+    this.ul.append(item);
+  }
+  removeItem (item){
+    this.ul.removeChild(item);
+  }
 }
