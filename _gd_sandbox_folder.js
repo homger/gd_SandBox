@@ -2,8 +2,8 @@
 
 
 class _gd_sandbox_folder{
-    constructor(name, path = "/", files = new Map(), folders = new Map(), 
-    creationDate = Date.now(), lastModified = Date.now() ){
+    constructor(name, uiElementType = "li", path = "/", files = new Map(), folders = new Map(), 
+    creationDate = Date.now(), lastModified = Date.now()){
 
         if(!(typeof name == "string"))
             throw new Error ("'name' typeof is not string");
@@ -19,6 +19,9 @@ class _gd_sandbox_folder{
         this._folders = folders;
         this._creationDate = creationDate;
         this._lastModified = lastModified;
+
+        this.__array_files_names = this.filesList;
+        this.uiElementType = uiElementType;
     }
     set path(path){
         console.log(path);
@@ -39,6 +42,8 @@ class _gd_sandbox_folder{
         this._fullName = this._path + name;
         this._folders.forEach(folder => folder.path = this._childPath);
         this._files.forEach(file => file.path = this._childPath);
+
+        this.uiName.innerHTML = name;
     }
     get path(){
         return this._path;
@@ -95,10 +100,11 @@ class _gd_sandbox_folder{
         let cach = [];
         
         this._folders.forEach(folder => cach.push(folder.folderContent) );
-        return[this.name,{
+        return {
+            name: this.name,
             files: this.files,
             folders: cach,
-        }];
+        };
     }
     addFolder(folder){
         if(!is_gd_sandbox_folder(folder)){
@@ -150,7 +156,63 @@ class _gd_sandbox_folder{
             folders: this.folders,
             creationDate: this._creationDate,
             lastModified: this._lastModified,
+            uiElementType: this.uiElementType,
         }
+    }
+
+    /*** OPTIMISE THIS  */
+    search(name, array){
+      if(typeof array === "undefined")
+        array = [];
+
+        this.filesList.forEach( filename => {
+          
+        }  );
+    }
+    
+    _make_ui_element(){
+      this.uiElement = document.createElement(this.uiElementType);
+      this.uiElement.className = "folder";
+      
+      this.uiName = document.createElement("div");
+      this.uiName.className = "name";
+      this.uiName.innerHTML = this.name;
+      this.uiElement.append(this.uiName);
+
+      this.uiContent = document.createElement("ul");
+      this.uiContent.className = "folder-content";
+
+      this.uiElement._gd_oject = this;
+      this._ui_made = true;
+
+      this.ui_ShowContent();
+
+      if(true)
+        this.ui_HideContent();
+    }
+
+    ui_ShowContent(){
+      if(this._ui_made){
+        this.uiElement.append(this.uiContent);
+        this.contentShow = true;
+      }
+    }
+
+    ui_HideContent(){
+      if(this._ui_made && this.contentShow){
+        this.uiElement.removeChild(this.uiContent);
+        this.contentShow = false;
+      }
+    }
+    
+    _ui_element_updateData(){
+      this.uiElement.innerHTML = "";
+      this.folderContent.folders.forEach( ({name}) => {
+        this.uiElement.append(this._folders.get(name).uiElement);
+      });
+      this.folderContent.files.forEach( ({name}) => {
+        this.uiElement.append(this._files.get(name).uiElement);
+      });
     }
 }
 
@@ -190,8 +252,10 @@ function _folderFromFolderData(folderData){
     
     folderData.folders.forEach(folder => foldersMap.set(folder.name, _folderFromFolderData(folder)));
 
-    cach = new _gd_sandbox_folder(folderData.name, folderData.path, 
+    cach = new _gd_sandbox_folder(folderData.name, folderData.uiElementType,folderData.path, 
         filesMap, foldersMap, folderData.creationDate, folderData.lastModified);
     ;
     return cach;
 }
+
+

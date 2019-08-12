@@ -20,6 +20,8 @@ class _gd_sandbox_file{
     set name(name){
         this._name = name;
         this._fullName = this._path + name;
+        
+        this.uiName.innerHTML = name;
     }
     set path(path){
         this._path = path;
@@ -97,6 +99,19 @@ class _gd_sandbox_file{
             }
         }
         return true;
+    }
+    
+    _make_ui_element(){
+      this.uiElement = document.createElement("li");
+      this.uiElement.className = "file";
+      
+      this.uiName = document.createElement("div");
+      this.uiName.className = "name";
+      this.uiName.innerHTML = this.name;
+
+      this.uiElement.append(this.uiName);
+      this.uiElement._gd_oject = this;
+
     }
 }
 function _fileFromFileData(file){

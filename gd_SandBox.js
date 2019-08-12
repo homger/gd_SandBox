@@ -33,6 +33,7 @@ class gd_SandBox{
       }.bind(this));
 
       this.nav.innerHTML = "<ul></ul>";
+      this.ul = this.nav.querySelector("ul");;
     }
 
     newProject(name){
@@ -46,7 +47,7 @@ class gd_SandBox{
               name: name, 
               project: new _gd_sandbox_project(name),
               mounted: false,
-              ui_project: ui_project(name),
+              //ui_project: ui_project(name),
               index: this.projectCount,
             }
             );
@@ -59,19 +60,39 @@ class gd_SandBox{
     mountProjects(){
       this.projectsList.forEach(function(projectData){
         if(!projectData.mounted){
-          this.nav.append(projectData.ui_project.ui_object);
+          this.ul.append(projectData.project.uiElement);
           this.events(projectData);
         }
       }.bind(this));
     }
 
-    addFolder(path){
+    addFolder(path_str){
+      let path_array = this.pathArray(path_str);
       
+      let projectData = this.getProject(path_array[0]);
+      path_array.shift();
+
+      if(path_array.length > 0){
+        path_array.forEach(function(pathElement){
+          
+        }.bind(this));
+      }
+
+      this.projectsList[0].project.addFolder(path);
+      this.projectsList[0].ui_project.ui_object.append(ui_folder(path));
+
     }
+    getProject(name){
+      if(typeof this.projectsNameList[name] === "undefined")
+        throw new Error("Project : '" + name + "' not found");
+      
+      return this.projectsList[this.projectsNameList[name]];
+    }
+
 
     events(projectData){
       console.log("EVENTS");
-      projectData.ui_project.ui_object.addEventListener("contextmenu",this.navContextMenu);
+      projectData.project.uiElement.addEventListener("contextmenu",this.navContextMenu);
     }
 
     navContextMenu(event){
@@ -79,6 +100,17 @@ class gd_SandBox{
       event.preventDefault();
       
     }
+
+
+    pathArray(path_str){
+      let path = path_str.split("/");
+      path.shift();
+      if(path[path.length - 1] == "")
+        path.pop();
+        
+      return path;
+    }
+    
 }
 
 
@@ -101,113 +133,4 @@ function objectDefaultValue(objectToCheck, defaultObject){
     }
   });
   return objectToCheck;
-}
-
-
-function ui_project(_gd_project_name){
-  let ui_object = document.createElement("div");
-  ui_object.className = "project";
-  
-
-  ui_object.innerHTML = `<div class="name">${FOLDER_ICON}${_gd_project_name}</div>`;
-  let ul = document.createElement("ul");
-  ul.className = "folder project-content";
-  ui_object.append(ul);
-  
-  let project = new __project(ui_object, ul, name);
-  return project;
-}
-
-function ui_folder(name){
-  let ui_object = document.createElement("li");
-  ui_object.className = "folder";
-
-  let ul = document.createElement("ul");
-  ul.className = "folder-content"
-  let ul_content = "";
-
-  ui_object.innerHTML = `<div class="name">${FOLDER_ICON}${name}<div>`;
-  ui_object.appendChild(ul);
-  
-  let folder = new __folder(ui_object, ul, name);
-  return folder;
-}
-
-function ui_file(name){
-  
-  let ui_object = document.createElement("li");
-  ui_object.className = "file";
-  
-  ui_object.innerHTML = `
-      <div class="name">${name}</div>
-    `;
-    let file = new __file(name, ui_object);
-  return file;
-}
-
-
-class __file{
-  constructor(name, ui_object){
-    this.name = name;
-    this.ui_object = ui_object;
-  }
-
-  setName(name){
-    this.ui_object.querySelector(".name").innerHTML = name;
-    this.name = name;
-  }
-  getName(){
-    return this.name;
-  }
-}
-
-class __folder{
-  
-  constructor(ui_object, ul, name){
-    this.ui_object = ui_object;
-    this.ul = ul;
-    this.name = name;
-  }
-
-  setName(name){
-    this.ui_object.querySelector(".name").innerHTML = name;
-    this.name = name;
-  }
-
-  getName(){
-    return this.name;
-  }
-  
-  addItem(item){
-    this.ul.append(item);
-  }
-  removeItem (item){
-    this.ul.removeChild(item);
-  }
-}
-
-
-class __project{
-  
-  constructor(ui_object, ul, name){
-    this.ui_object = ui_object;
-    this.ul = ul;
-    this.name = name;
-  }
-
-  setName(name){
-    this.ui_object.querySelector(".name").innerHTML = name;
-    this.name = name;
-  }
-
-  getName(){
-    return this.name;
-  }
-  
-  addItem(item){
-    this.ul.append(item);
-  }
-  removeItem (item){
-    this.ul.removeChild(item);
-  }
 }
