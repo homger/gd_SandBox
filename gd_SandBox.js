@@ -66,27 +66,35 @@ class gd_SandBox{
       }.bind(this));
     }
 
-    addFolder(path_str){
+    addFolder(path_str, newFolderName){
+      let folder = this.findFolder(path_str);
+      folder.newFolder(newFolderName);
+    }
+    addFile(path_str, file){
+      let folder = this.findFolder(path_str);
+      folder.addFile(file);
+    }
+    findFolder(path_str){
       let path_array = this.pathArray(path_str);
       
-      let projectData = this.getProject(path_array[0]);
+      let project = this.getProject(path_array[0]);
+      let folder = project.projectFolder;
       path_array.shift();
 
-      if(path_array.length > 0){
-        path_array.forEach(function(pathElement){
-          
-        }.bind(this));
+      let length = path_array.length;
+      
+      
+      for(let i = 0; i < length; ++i){
+        folder = folder.getFolderByName(path_array[i]);
+
       }
-
-      this.projectsList[0].project.addFolder(path);
-      this.projectsList[0].ui_project.ui_object.append(ui_folder(path));
-
+      return folder;
     }
     getProject(name){
       if(typeof this.projectsNameList[name] === "undefined")
         throw new Error("Project : '" + name + "' not found");
       
-      return this.projectsList[this.projectsNameList[name]];
+      return this.projectsList[this.projectsNameList[name]].project;
     }
 
 

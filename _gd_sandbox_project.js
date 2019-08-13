@@ -3,7 +3,7 @@
 
 
 class _gd_sandbox_project{
-    constructor(project_name, projectFolder = new _gd_sandbox_folder(project_name, "ul"), ui_type = "li" ){
+    constructor(project_name, projectFolder = new _gd_sandbox_folder(project_name, "div") ){
         if( !(typeof project_name == "string") )
             throw new TypeError('typeof project_name == "string"');
         
@@ -16,8 +16,16 @@ class _gd_sandbox_project{
         }
         
         this.name = project_name;
-        this.projectFolder._make_ui_element();
-        this.uiElement = this.projectFolder.uiElement;
+        //this.projectFolder._make_ui_element();
+        
+        this.projectFolderUiElement = this.projectFolder.uiElement;
+        this.projectFolderUiElement.className = "project";
+        addClass(this.projectFolderUiElement._gd_oject.uiContent, "project-content");
+        this.uiElement = document.createElement("li");
+        this.uiElement.append(this.projectFolderUiElement);
+
+        //this.projectFolder.toggleUiContent();
+        console.log(this.projectFolder.folderContent);
     }
 
     projectData(){
@@ -27,6 +35,9 @@ class _gd_sandbox_project{
         };
     }
     addFolder(path){
+      this.projectFolder.addFolder(new _gd_sandbox_folder(path));
+    }
+    addFile(path){
       this.projectFolder.addFolder(new _gd_sandbox_folder(path));
     }
 
@@ -43,7 +54,36 @@ class _gd_sandbox_project{
     }
 }
 
+//FOR IE
 
+function removeClass(element, _class){
+  let index = element.className.indexOf(_class);
+
+  if(index > -1){
+    let classArray = element.className.split("");
+    classArray.splice(index, _class.length);
+    element.className = classArray.join("");
+    return;
+  }
+}
+function addClass(element, _class){
+  let index = element.className.indexOf(_class);
+  if(index == -1){
+    element.className = element.className + " " + _class;
+  }
+}
+function toggleClass(element, _class){
+  let index = element.className.indexOf(_class);
+  if(index > -1){
+    let classArray = element.className.split("");
+    classArray.splice(index, _class.length);
+    element.className = classArray.join("");
+    return;
+  }
+  element.className = element.className + " " + _class;
+}
+
+/*
 function _projectFromProjectData(projectData){
     return new _gd_sandbox_project(projectData.name, _folderFromFolderData(projectData.content));
 }
@@ -160,3 +200,5 @@ class __project{
     this.ul.removeChild(item);
   }
 }
+
+*/

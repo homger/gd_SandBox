@@ -22,6 +22,12 @@ class _gd_sandbox_folder{
 
         this.__array_files_names = this.filesList;
         this.uiElementType = uiElementType;
+
+        this.ui_contentHide = false;
+        this.icon = _FOLDER_ICON_48587455485841;
+
+        this._make_ui_element();
+
     }
     set path(path){
         console.log(path);
@@ -43,7 +49,7 @@ class _gd_sandbox_folder{
         this._folders.forEach(folder => folder.path = this._childPath);
         this._files.forEach(file => file.path = this._childPath);
 
-        this.uiName.innerHTML = name;
+        this.uiName.innerHTML = this.icon + name;
     }
     get path(){
         return this._path;
@@ -117,6 +123,11 @@ class _gd_sandbox_folder{
             folder.path = this._childPath;
             this._folders.set(folder.name, folder);
         }
+        this._ui_element_updateData();
+        
+    }
+    newFolder(name){
+      this.addFolder(new _gd_sandbox_folder(name));
     }
     addFile(file){
         if(!is_gd_sandbox_file(file)){
@@ -124,6 +135,7 @@ class _gd_sandbox_folder{
         }
         this._files.set(file.name, file);
         file._path = this._childPath;
+        this._ui_element_updateData();
     }
     mergeFolder(folder){
         if(!is_gd_sandbox_folder(folder)){
@@ -160,14 +172,13 @@ class _gd_sandbox_folder{
         }
     }
 
-    /*** OPTIMISE THIS  */
-    search(name, array){
-      if(typeof array === "undefined")
-        array = [];
+    
+    getFolderByName(name){
+      if(this._folders.has(name))
+        return this._folders.get(name);
 
-        this.filesList.forEach( filename => {
-          
-        }  );
+      console.warn("folder '"+name+"' not found");
+      return undefined;
     }
     
     _make_ui_element(){
@@ -176,7 +187,7 @@ class _gd_sandbox_folder{
       
       this.uiName = document.createElement("div");
       this.uiName.className = "name";
-      this.uiName.innerHTML = this.name;
+      this.uiName.innerHTML = this.icon + this.name;
       this.uiElement.append(this.uiName);
 
       this.uiContent = document.createElement("ul");
@@ -187,7 +198,7 @@ class _gd_sandbox_folder{
 
       this.ui_ShowContent();
 
-      if(true)
+      if(this.ui_contentHide)
         this.ui_HideContent();
     }
 
@@ -204,14 +215,22 @@ class _gd_sandbox_folder{
         this.contentShow = false;
       }
     }
+
+    toggleUiContent(){
+      if(this._ui_made){
+        this.contentShow = !this.contentShow;
+        this.contentShow ? 
+        this.ui_ShowContent() : this.ui_HideContent();
+      }
+    }
     
     _ui_element_updateData(){
-      this.uiElement.innerHTML = "";
+      this.uiContent.innerHTML = "";
       this.folderContent.folders.forEach( ({name}) => {
-        this.uiElement.append(this._folders.get(name).uiElement);
+        this.uiContent.append(this._folders.get(name).uiElement);
       });
       this.folderContent.files.forEach( ({name}) => {
-        this.uiElement.append(this._files.get(name).uiElement);
+        this.uiContent.append(this._files.get(name).uiElement);
       });
     }
 }
@@ -259,3 +278,10 @@ function _folderFromFolderData(folderData){
 }
 
 
+
+const _FOLDER_ICON_48587455485841 = `<svg class="folder-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+<g transform="translate(0 16) rotate(-90)">
+<path d="M 14.79290008544922 15.5 L 0.5 15.5 L 0.5 1.207100033760071 L 7.646450042724609 8.353549957275391 L 14.79290008544922 15.5 Z"/>
+<path d="M 1 2.414219856262207 L 1 15 L 13.58578014373779 15 L 7.292889595031738 8.707109451293945 L 1 2.414219856262207 M 0 0 L 8 8 L 16 16 L 0 16 L 0 0 Z"/>
+</g>
+</svg>`;
