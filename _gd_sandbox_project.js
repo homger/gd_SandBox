@@ -19,8 +19,9 @@ class _gd_sandbox_project{
         //this.projectFolder._make_ui_element();
         
         this.projectFolderUiElement = this.projectFolder.uiElement;
-        this.projectFolderUiElement.className = "project";
-        addClass(this.projectFolderUiElement._gd_oject.uiContent, "project-content");
+        addClass(this.projectFolderUiElement, "project");
+        removeClass(this.projectFolderUiElement, "folder");
+        addClass(this.projectFolder.uiContent, "folder project-content");
         this.uiElement = document.createElement("li");
         this.uiElement.append(this.projectFolderUiElement);
 

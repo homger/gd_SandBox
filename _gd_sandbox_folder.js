@@ -23,7 +23,7 @@ class _gd_sandbox_folder{
         this.__array_files_names = this.filesList;
         this.uiElementType = uiElementType;
 
-        this.ui_contentHide = false;
+        this.ui_contentHide = true;
         this.icon = _FOLDER_ICON_48587455485841;
 
         this._make_ui_element();
@@ -188,12 +188,16 @@ class _gd_sandbox_folder{
       this.uiName = document.createElement("div");
       this.uiName.className = "name";
       this.uiName.innerHTML = this.icon + this.name;
+      this.uiName.onclick = function(){
+        this.parentNode._gd_oject.toggleUiContent();
+      }
       this.uiElement.append(this.uiName);
 
       this.uiContent = document.createElement("ul");
       this.uiContent.className = "folder-content";
 
       this.uiElement._gd_oject = this;
+      this.uiElement._type = "folder";
       this._ui_made = true;
 
       this.ui_ShowContent();
@@ -206,6 +210,7 @@ class _gd_sandbox_folder{
       if(this._ui_made){
         this.uiElement.append(this.uiContent);
         this.contentShow = true;
+        toggleClass(this.uiElement, "show-content");
       }
     }
 
@@ -213,14 +218,21 @@ class _gd_sandbox_folder{
       if(this._ui_made && this.contentShow){
         this.uiElement.removeChild(this.uiContent);
         this.contentShow = false;
+        toggleClass(this.uiElement, "show-content");
       }
     }
 
     toggleUiContent(){
+      console.log("toggleUiContent");
       if(this._ui_made){
-        this.contentShow = !this.contentShow;
-        this.contentShow ? 
-        this.ui_ShowContent() : this.ui_HideContent();
+        //debugger;
+        if(this.contentShow){
+          this.ui_HideContent();
+          console.log("HIDE");
+          return;
+        }
+        this.ui_ShowContent();
+        console.log("SHOW");
       }
     }
     
@@ -279,9 +291,20 @@ function _folderFromFolderData(folderData){
 
 
 
-const _FOLDER_ICON_48587455485841 = `<svg class="folder-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+const _FOLDER_ICON_48587455485841 = `<svg class="gd-folder-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
 <g transform="translate(0 16) rotate(-90)">
 <path d="M 14.79290008544922 15.5 L 0.5 15.5 L 0.5 1.207100033760071 L 7.646450042724609 8.353549957275391 L 14.79290008544922 15.5 Z"/>
 <path d="M 1 2.414219856262207 L 1 15 L 13.58578014373779 15 L 7.292889595031738 8.707109451293945 L 1 2.414219856262207 M 0 0 L 8 8 L 16 16 L 0 16 L 0 0 Z"/>
 </g>
 </svg>`;
+
+function toggleClass(element, _class){
+  let index = element.className.indexOf(_class);
+  if(index > -1){
+    let classArray = element.className.split("");
+    classArray.splice(index, _class.length);
+    element.className = classArray.join("");
+    return;
+  }
+  element.className = element.className + " " + _class;
+}

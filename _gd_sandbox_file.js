@@ -114,6 +114,7 @@ class _gd_sandbox_file{
       this.uiElement.append(this.uiName);
       this.uiElement._gd_oject = this;
 
+      this.uiElement._type = "file";
     }
 }
 function _fileFromFileData(file){

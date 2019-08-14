@@ -101,12 +101,25 @@ class gd_SandBox{
     events(projectData){
       console.log("EVENTS");
       projectData.project.uiElement.addEventListener("contextmenu",this.navContextMenu);
+      //projectData.project.uiElement.addEventListener("click",this.navClick.bind(this));
+
     }
 
     navContextMenu(event){
       console.log(event.screenX);
       event.preventDefault();
+      this.contextMenuPop(event.target);
+    }
+    contextMenuPop(gd_element){
       
+    }
+
+    navClick(event){
+      console.log(" click");
+      if(event.target.className === "gd-folder-icon"){
+        console.log("gd-folder-icon click");
+        event.target.parentNode.parentNode._gd_oject.toggleUiContent();
+      }
     }
 
 
@@ -121,6 +134,17 @@ class gd_SandBox{
     
 }
 
+const fileContextMenu = `
+<div>
+
+</div>
+`;
+
+const folderContextMenu = `
+<div>
+  <div>addFolder</div>
+</div>
+`;
 
 /*
 use Object.freeze on defaultObject
