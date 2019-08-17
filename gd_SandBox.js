@@ -20,6 +20,10 @@ class gd_SandBox{
         this.projectCount = 0;
         this.initialSetUp();
 
+        window.addEventListener("contextmenu", this.navContextMenu);
+        this.___windowClick = this.___windowClick.bind(this);
+        this.removeContextMenu = this.removeContextMenu.bind(this);
+
     }
 
     initialSetUp(){
@@ -34,8 +38,11 @@ class gd_SandBox{
 
       this.nav.innerHTML = "<ul></ul>";
       this.ul = this.nav.querySelector("ul");;
+      this.contextMenuNameList = [];
+      this.contextMenuSetup();
+      
     }
-
+    
     newProject(name){
         if(!(typeof name == "string")){
             name = "N/A";
@@ -100,7 +107,7 @@ class gd_SandBox{
 
     events(projectData){
       console.log("EVENTS");
-      projectData.project.uiElement.addEventListener("contextmenu",this.navContextMenu);
+      //projectData.project.uiElement.addEventListener("contextmenu",this.navContextMenu);
       //projectData.project.uiElement.addEventListener("click",this.navClick.bind(this));
 
     }
@@ -108,10 +115,53 @@ class gd_SandBox{
     navContextMenu(event){
       console.log(event.screenX);
       event.preventDefault();
-      this.contextMenuPop(event.target);
+      let gd_object = event.target;
+      while(true){
+        console.log("ITé --");
+        let length = this.contextMenuNameList.length;
+        for(let i = 0; i< length; ++i){
+          if(hasClass(gd_object, this.contextMenuNameList[i])){
+            
+            this.choosenFolder = gd_object;
+            console.log(gd_object);
+            this.contextMenuPop(gd_object._gd_oject,
+              {
+                x: event.pageX,
+                y: event.pageY,
+              });
+          }
+        }
+        gd_object = gd_object.parentNode;
+        if(gd_object.tagName == "BODY" || gd_object.tagName == "body")
+          return;
+      }
     }
-    contextMenuPop(gd_element){
-      
+    contextMenuPop(gd_element, xy){
+      console.log(gd_element.uiElement._type);
+
+      this.chosenContextMenu = this.contextMenuList[gd_element.uiElement._type];
+      this.openedContextmenuType = gd_element.uiElement._type;
+
+      document.body.appendChild(this.chosenContextMenu);
+
+      let _xy = this.contextMenuBounding(xy);
+      this.chosenContextMenu.style.top = _xy.y + "px";
+      this.chosenContextMenu.style.left = _xy.x + "px";
+
+      window.addEventListener("mousedown", this.___windowClick);
+    }
+
+    ___windowClick(event){
+      if(event.target.parentNode === this.chosenContextMenu 
+        || event.target === this.chosenContextMenu){
+          return;
+        }
+      document.body.removeChild(this.chosenContextMenu);
+      window.removeEventListener("mousedown", this.___windowClick);
+    }
+    removeContextMenu(){
+      document.body.removeChild(this.chosenContextMenu);
+      window.removeEventListener("mousedown", this.___windowClick);
     }
 
     navClick(event){
@@ -131,9 +181,53 @@ class gd_SandBox{
         
       return path;
     }
-    
-}
 
+    contextMenuBounding({x,y}){
+      let _y = y + this.chosenContextMenu.offsetHeight - document.documentElement.offsetHeight;
+      let _x = x + this.chosenContextMenu.offsetWidth - document.documentElement.offsetWidth;
+      console.log("_y  :  " + _y);
+      if(_y > 0)
+        _y  = y - _y;
+      else
+        _y = y;
+      if(_x > 0)
+      _x  = x - _x;
+      else
+        _x = x;
+        
+      return {x:_x,y:_y};
+    }
+    contextMenuSetup(){
+      this.contextMenuList = [];
+      this.contextMenuMake("folder",[
+        ["Add Folder", function(){
+          this.choosenFolder.newFolder(prompt("New Folder name", "N/A"));
+        }.bind(this), "add-folder"],
+      ]);
+      }
+
+    contextMenuMake(contextMenuName, options){
+      this.contextMenuNameList.push(contextMenuName);
+      this.contextMenuList[contextMenuName] = document.createElement("div");
+      this.contextMenuList[contextMenuName].className = "context-menu";
+
+      let cach;
+      options.forEach((option) => {
+        cach = document.createElement("div");
+        cach.innerHTML = option[0];
+        cach.onclick = function(){
+          this.removeContextMenu();
+          option[1]();
+        }.bind(this);
+        if(typeof option[3] === "string")
+          cach.className = option[3];
+        
+          this.contextMenuList[contextMenuName].append(cach);
+      });
+
+    }
+}
+div
 const fileContextMenu = `
 <div>
 
@@ -141,7 +235,7 @@ const fileContextMenu = `
 `;
 
 const folderContextMenu = `
-<div>
+<div style="background-color:yellow;width:50px;height:100">
   <div>addFolder</div>
 </div>
 `;
@@ -165,4 +259,26 @@ function objectDefaultValue(objectToCheck, defaultObject){
     }
   });
   return objectToCheck;
+}
+
+
+function hasClass(element, _class){
+  let index = element.className.indexOf(_class);
+
+  if(index > -1){
+    if(checkBorder(element.className, index, _class.length)){
+      console.log(element.className);
+    }
+    return checkBorder(element.className, index, _class.length);
+  }
+  return false;
+}
+
+function checkBorder(string, index, length){
+  let m_length = length - 1;
+  if(index > 0 && string[index - 1] !== " ")
+    return false;
+  if(string.length > index + length && string[index + length] !== " ")
+    return false;
+  return true;
 }
