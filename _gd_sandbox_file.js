@@ -38,6 +38,12 @@ class _gd_sandbox_file{
     get fullName(){
         return this._fullName;
     }
+    isOpen(){
+      return this._open;
+    }
+    get isOpen(){
+      return this._open;
+    }
     open(){
         if(this._open){
             console.warn(" _gd_sandbox_file is already open");
@@ -114,7 +120,14 @@ class _gd_sandbox_file{
       this.uiElement.append(this.uiName);
       this.uiElement._gd_oject = this;
 
-      this.uiElement._type = "file";
+      this.uiElement._contextmenu_type = "file";
+    }
+
+    removeFile(){
+      if(this.parentFolder instanceof _gd_sandbox_folder){
+        this.parentFolder._files.delete(this.name);
+      }
+      this.uiElement.parentNode.removeChild(this.uiElement);
     }
 }
 function _fileFromFileData(file){

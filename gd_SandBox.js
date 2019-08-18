@@ -11,18 +11,21 @@ const UI_ELEMENTS_NAME = ["nav","header","editor","footer"]
 class gd_SandBox{
 
     constructor(parameters = PARAMETERS_DEFAULT_VALUE){
-        this.navContextMenu = this.navContextMenu.bind(this);
+        this.contextMenuCall = this.contextMenuCall.bind(this);
 
         this.parameters = objectDefaultValue(parameters, PARAMETERS_DEFAULT_VALUE);
         
+        this.editorList = new Map();
+
         this.projectsList = [];
         this.projectsNameList = [];
         this.projectCount = 0;
         this.initialSetUp();
-
-        window.addEventListener("contextmenu", this.navContextMenu);
+        
+        window.addEventListener("contextmenu", this.contextMenuCall);
         this.___windowClick = this.___windowClick.bind(this);
         this.removeContextMenu = this.removeContextMenu.bind(this);
+        this._preventDefault = this._preventDefault.bind(this);
 
     }
 
@@ -40,6 +43,7 @@ class gd_SandBox{
       this.ul = this.nav.querySelector("ul");;
       this.contextMenuNameList = [];
       this.contextMenuSetup();
+      this.editorSetup();
       
     }
     
@@ -48,11 +52,12 @@ class gd_SandBox{
             name = "N/A";
         }
         if(typeof this.projectsNameList[name] === "undefined"){
+          let newproject = new _gd_sandbox_project(name);
           this.projectsNameList[name] = this.projectCount;
           this.projectsList.push(
             {
               name: name, 
-              project: new _gd_sandbox_project(name),
+              project: newproject,
               mounted: false,
               //ui_project: ui_project(name),
               index: this.projectCount,
@@ -61,6 +66,7 @@ class gd_SandBox{
             
             ++this.projectCount;
             this.mountProjects();
+            return newproject;
         }
     }
 
@@ -75,11 +81,12 @@ class gd_SandBox{
 
     addFolder(path_str, newFolderName){
       let folder = this.findFolder(path_str);
-      folder.newFolder(newFolderName);
+      return folder.newFolder(newFolderName);
     }
     addFile(path_str, file){
       let folder = this.findFolder(path_str);
       folder.addFile(file);
+      //return file;
     }
     findFolder(path_str){
       let path_array = this.pathArray(path_str);
@@ -107,28 +114,30 @@ class gd_SandBox{
 
     events(projectData){
       console.log("EVENTS");
-      //projectData.project.uiElement.addEventListener("contextmenu",this.navContextMenu);
+      //projectData.project.uiElement.addEventListener("contextmenu",this.contextMenuCall);
       //projectData.project.uiElement.addEventListener("click",this.navClick.bind(this));
 
     }
 
-    navContextMenu(event){
+    contextMenuCall(event){
       console.log(event.screenX);
-      event.preventDefault();
+      
       let gd_object = event.target;
+      let length = this.contextMenuNameList.length;
       while(true){
         console.log("ITé --");
-        let length = this.contextMenuNameList.length;
         for(let i = 0; i< length; ++i){
           if(hasClass(gd_object, this.contextMenuNameList[i])){
             
-            this.choosenFolder = gd_object;
+            this.contextMenu_ChoosenElement = gd_object._gd_oject;
             console.log(gd_object);
-            this.contextMenuPop(gd_object._gd_oject,
+            this.contextMenuPop(this.contextMenu_ChoosenElement,
               {
                 x: event.pageX,
                 y: event.pageY,
               });
+              event.preventDefault();
+              return;
           }
         }
         gd_object = gd_object.parentNode;
@@ -137,10 +146,10 @@ class gd_SandBox{
       }
     }
     contextMenuPop(gd_element, xy){
-      console.log(gd_element.uiElement._type);
+      console.log(gd_element.uiElement._contextmenu_type);
 
-      this.chosenContextMenu = this.contextMenuList[gd_element.uiElement._type];
-      this.openedContextmenuType = gd_element.uiElement._type;
+      this.chosenContextMenu = this.contextMenuList[gd_element.uiElement._contextmenu_type];
+      this.openedContextmenuType = gd_element.uiElement._contextmenu_type;
 
       document.body.appendChild(this.chosenContextMenu);
 
@@ -199,17 +208,46 @@ class gd_SandBox{
     }
     contextMenuSetup(){
       this.contextMenuList = [];
+      
       this.contextMenuMake("folder",[
-        ["Add Folder", function(){
-          this.choosenFolder.newFolder(prompt("New Folder name", "N/A"));
+        ["New Folder", function(){
+          this.contextMenu_ChoosenElement.newFolder(prompt("New Folder name", "N/A"));
+        }.bind(this), "add-folder"],
+        ["Remove folder", function(){
+          this.contextMenu_ChoosenElement.removeFolder();
+        }.bind(this), "remove-folder"],
+      ]);
+      
+      this.contextMenuMake("project",[
+        ["New Folder", function(){
+          this.contextMenu_ChoosenElement.newFolder(prompt("New Folder name", "N/A"));
         }.bind(this), "add-folder"],
       ]);
-      }
+      
+      this.contextMenuMake("file",[
+        ["Remove file", function(){
+          this.contextMenu_ChoosenElement.removeFile();
+        }.bind(this), "remove-file"],
+        ["Open file", function(){
+          this.openFile(this.contextMenu_ChoosenElement);
+        }.bind(this), "open-file"],
+        ["Close file", function(){
+          this.closeFile(this.contextMenu_ChoosenElement);
+        }.bind(this), "close-file"],
+      ]);
 
+
+      }
+    
+    _preventDefault(event){
+      event.preventDefault();
+    }
     contextMenuMake(contextMenuName, options){
       this.contextMenuNameList.push(contextMenuName);
       this.contextMenuList[contextMenuName] = document.createElement("div");
       this.contextMenuList[contextMenuName].className = "context-menu";
+
+      this.contextMenuList[contextMenuName].addEventListener("contextmenu",this._preventDefault);
 
       let cach;
       options.forEach((option) => {
@@ -226,19 +264,52 @@ class gd_SandBox{
       });
 
     }
+
+
+
+    openFile(file){
+      
+      if(!file.isOpen){
+        let _editor = new _gd_sandbox_editor();
+        this.editorList.set(file, _editor);
+        _editor.setFile(file);
+        this.editor.append(_editor.uiElement);
+
+      }
+    }
+    closeFile(file){
+      if(file.isOpen){
+
+          let _editor = this.editorList.get(file);
+          _editor.removeFile();
+          this.editorList.delete(file);
+          this.editor.removeChild(_editor.uiElement);
+        }
+    }
+
+    editorSetup(){
+      this.editorSelectorSetup();
+    }
+    editorSelectorSetup(){
+      this.editorSelector = document.createElement("div");
+      this.editorSelector.className = "editor-selector";
+      this.editorSelectorList = new Map();
+      this.selectedFile = null;
+    }
+    addEditorSelector(file){
+
+      let selector = document.createElement("div");
+      selector._contextmenu_type = "file";
+      selector.className = "selector";
+
+      this.editorSelectorList.set(file);
+      this.editorSelector.append(selector);
+
+    }
+    
 }
-div
-const fileContextMenu = `
-<div>
 
-</div>
-`;
 
-const folderContextMenu = `
-<div style="background-color:yellow;width:50px;height:100">
-  <div>addFolder</div>
-</div>
-`;
 
 /*
 use Object.freeze on defaultObject

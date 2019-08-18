@@ -26,6 +26,7 @@ class _gd_sandbox_folder{
         this.ui_contentHide = true;
         this.icon = _FOLDER_ICON_48587455485841;
 
+        this.updateChildsParentFolder();
         this._make_ui_element();
 
     }
@@ -44,10 +45,11 @@ class _gd_sandbox_folder{
             throw new Error ("'name' Is invalid");
         }
         this._name = name;
-        this._childPath = this._path + name + "/";
+        this.path = this._path;
+        /*this._childPath = this._path + name + "/";
         this._fullName = this._path + name;
         this._folders.forEach(folder => folder.path = this._childPath);
-        this._files.forEach(file => file.path = this._childPath);
+        this._files.forEach(file => file.path = this._childPath);*/
 
         this.uiName.innerHTML = this.icon + name;
     }
@@ -69,27 +71,27 @@ class _gd_sandbox_folder{
     get filesList(){
         return __nameArray(this._files);
     }
-    get folders(){
+    get folders(){ //List folders folderData()
         let cach = [];
         this._folders.forEach(folder => cach.push(folder.folderData()));
         return cach;
     }
-    get foldersName(){
+    get foldersNameList(){
         let cach = [];
         this._folders.forEach(folder => cach.push(folder.name));
         return cach;
     }
-    get files(){
+    get files(){ //List files fileData
         let cach = [];
         this._files.forEach(file => cach.push(file.fileData));
         return cach;
     }
-    getFileArray(){
+    getFileArrayList(){
         let cach = [];
         this._files.forEach(file => cach.push(file));
         return cach;
     }
-    get filesName(){
+    get filesNameList(){
         let cach = [];
         this._files.forEach(file => cach.push(file._name));
         return cach;
@@ -122,12 +124,15 @@ class _gd_sandbox_folder{
         else{
             folder.path = this._childPath;
             this._folders.set(folder.name, folder);
+            folder.parentFolder = this;
         }
         this._ui_element_updateData();
         
     }
     newFolder(name){
-      this.addFolder(new _gd_sandbox_folder(name));
+      let folder = new _gd_sandbox_folder(name);
+      this.addFolder(folder);
+      return folder;
     }
     addFile(file){
         if(!is_gd_sandbox_file(file)){
@@ -135,31 +140,36 @@ class _gd_sandbox_folder{
         }
         this._files.set(file.name, file);
         file._path = this._childPath;
+        file.parentFolder = this;
         this._ui_element_updateData();
     }
     mergeFolder(folder){
         if(!is_gd_sandbox_folder(folder)){
             throw new Error("folder is not instanceof _gd_sandbox_folder");
         }
-        folder.path = this._path;
-        folder.folders.forEach((folder, name) =>{
-            if(this._folders.has(name)){
-                this._folders.get(name).mergeFolder(folder);
+        //folder.path = this._path;
+        folder.folders.forEach((folderData) =>{
+            if(this._folders.has(folderData.name)){
+                this._folders.get(name).
+                mergeFolder(_folderFromFolderData(folderData));
             }
             else{
-                this._folders.set(name, folder);
+                this._folders.set(folderData.name, 
+                  _folderFromFolderData(folderData));
             }
         });
-        folder.files.forEach((file, name) => {
-            this._files.set(name, file);
+        folder.files.forEach((fileData) => {
+            this._files.set(fileData.name, 
+              _fileFromFileData(fileData));
         } );
+
+        this.path = this._path;
+
+        console.log("MERGE DONE :  ")
+        console.log(this.folderData());
+        this._ui_element_updateData();
     }
 
-    _folderFromArray(folderArray){
-        if(!(folderArray instanceof Array)){
-            throw new Error("folderArray is not instanceof Array");
-        }
-    }
     folderData(){
         return{
             name: this._name,
@@ -180,6 +190,13 @@ class _gd_sandbox_folder{
       console.warn("folder '"+name+"' not found");
       return undefined;
     }
+    getFileByName(name){
+      if(this._files.has(name))
+        return this._files.get(name);
+
+      console.warn("file '"+name+"' not found");
+      return undefined;
+    }
     
     _make_ui_element(){
       this.uiElement = document.createElement(this.uiElementType);
@@ -197,7 +214,7 @@ class _gd_sandbox_folder{
       this.uiContent.className = "folder-content";
 
       this.uiElement._gd_oject = this;
-      this.uiElement._type = "folder";
+      this.uiElement._contextmenu_type = "folder";
       this._ui_made = true;
 
       this.ui_ShowContent();
@@ -243,6 +260,30 @@ class _gd_sandbox_folder{
       });
       this.folderContent.files.forEach( ({name}) => {
         this.uiContent.append(this._files.get(name).uiElement);
+      });
+    }
+
+    removeFolder(){
+      if(this.parentFolder instanceof _gd_sandbox_folder){
+        this.parentFolder._folders.delete(this.name);
+      }
+      this.uiElement.parentNode.removeChild(this.uiElement);
+    }
+    removeChildFoler(name){
+      if(this._folders.has(name))
+        this._folders.get(name).removeFolder();
+    }
+    removeFile(name){
+      if(this._files.has(name))
+        this._files.get(name).removeFile();
+    }
+
+    updateChildsParentFolder(){
+      this._folders.forEach((folder) => {
+        folder.parentFolder = this;
+      });
+      this._files.forEach((file) => {
+        file.parentFolder = this;
       });
     }
 }
@@ -307,4 +348,25 @@ function toggleClass(element, _class){
     return;
   }
   element.className = element.className + " " + _class;
+}
+
+function hasClass(element, _class){
+  let index = element.className.indexOf(_class);
+
+  if(index > -1){
+    if(checkBorder(element.className, index, _class.length)){
+      console.log(element.className);
+    }
+    return checkBorder(element.className, index, _class.length);
+  }
+  return false;
+}
+
+function checkBorder(string, index, length){
+  let m_length = length - 1;
+  if(index > 0 && string[index - 1] !== " ")
+    return false;
+  if(string.length > index + length && string[index + length] !== " ")
+    return false;
+  return true;
 }

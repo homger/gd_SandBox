@@ -5,10 +5,13 @@ class _gd_sandbox_editor{
 
         this._hasFile = false;
         this._textArea = document.createElement("textarea");
+        this._textArea.className = "editor";
         this._textArea.addEventListener("keyup", function(){
             this._file.content = this._textArea.value;
             console.log(this._file.fileData);
         }.bind(this));
+
+        this.uiElement = this._textArea;
     }
     set className(className){
         this._textArea.className = className;
@@ -27,19 +30,24 @@ class _gd_sandbox_editor{
         if(!is_gd_sandbox_file(file)){
             throw new Error("file is not instanceof _gd_sandbox_file");
         }
-        if(this._hasFile){
-            this._file.close();
-            this._file = null;
-            this._hasFile = false;
-        }
+        this.removeFile();
         if(file.open()){
             this._hasFile = true;
             this._file = file;
             this._textArea.value = this.file.content;
+            this._file._gd_editor = this;
         }
         else{
             throw new Error("file is already open");
         }
+    }
+    removeFile(){
+      if(this._hasFile){
+          this._file.close();
+          this._file._gd_editor = null;
+          this._file = null;
+          this._hasFile = false;
+      }
     }
     get file(){
         return this._file;
