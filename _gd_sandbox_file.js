@@ -15,6 +15,7 @@ class _gd_sandbox_file{
         this._creationDate = creationDate;
         this._lastModified = lastModified;
         this._open = false;
+        this.editor = null;
 
         this._make_ui_element();
     }

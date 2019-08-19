@@ -12,6 +12,7 @@ class gd_SandBox{
 
     constructor(parameters = PARAMETERS_DEFAULT_VALUE){
         this.contextMenuCall = this.contextMenuCall.bind(this);
+        this.dblclickCall = this.dblclickCall.bind(this);
 
         this.parameters = objectDefaultValue(parameters, PARAMETERS_DEFAULT_VALUE);
         
@@ -23,6 +24,7 @@ class gd_SandBox{
         this.initialSetUp();
         
         window.addEventListener("contextmenu", this.contextMenuCall);
+        window.addEventListener("dblclick", this.dblclickCall);
         this.___windowClick = this.___windowClick.bind(this);
         this.removeContextMenu = this.removeContextMenu.bind(this);
         this._preventDefault = this._preventDefault.bind(this);
@@ -43,6 +45,7 @@ class gd_SandBox{
       this.ul = this.nav.querySelector("ul");;
       this.contextMenuNameList = [];
       this.contextMenuSetup();
+      this.dblclickSetup();
       this.editorSetup();
       
     }
@@ -226,6 +229,9 @@ class gd_SandBox{
       
       this.contextMenuMake("file",[
         ["Remove file", function(){
+          if(this.contextMenu_ChoosenElement.isOpen){
+            this.closeFile(this.contextMenu_ChoosenElement);
+          }
           this.contextMenu_ChoosenElement.removeFile();
         }.bind(this), "remove-file"],
         ["Open file", function(){
@@ -264,8 +270,39 @@ class gd_SandBox{
       });
 
     }
-
-
+    dblclickSetup(){
+      this.dblclickNameList = [];
+      this.dblclickNameList.push("file");
+    }
+    dblclickCall(event){
+      console.log(event.screenX);
+      
+      let gd_object = event.target;
+      let length = this.dblclickNameList.length;
+      while(true){
+        for(let i = 0; i< length; ++i){
+          if(hasClass(gd_object, this.dblclickNameList[i])){
+            
+            this.dblclick_ChoosenElement = gd_object._gd_oject;
+            console.log(gd_object);
+            this.dblclickAction(this.dblclick_ChoosenElement,
+              {
+                x: event.pageX,
+                y: event.pageY,
+              });
+              event.preventDefault();
+              return;
+          }
+        }
+        gd_object = gd_object.parentNode;
+        if(gd_object.tagName == "BODY" || gd_object.tagName == "body")
+          return;
+      } 
+    }
+    dblclickAction(element){
+      console.log("dblclickAction");
+      this.openFile(element);
+    }
 
     openFile(file){
       
@@ -274,7 +311,8 @@ class gd_SandBox{
         this.editorList.set(file, _editor);
         _editor.setFile(file);
         this.editor.append(_editor.uiElement);
-
+        this.addEditorSelector(file);
+        this.editorSelectFile(file);
       }
     }
     closeFile(file){
@@ -284,6 +322,7 @@ class gd_SandBox{
           _editor.removeFile();
           this.editorList.delete(file);
           this.editor.removeChild(_editor.uiElement);
+          this.removeEditorSelector(file);
         }
     }
 
@@ -291,20 +330,55 @@ class gd_SandBox{
       this.editorSelectorSetup();
     }
     editorSelectorSetup(){
+      this.contextMenuNameList.push("selector");
       this.editorSelector = document.createElement("div");
       this.editorSelector.className = "editor-selector";
       this.editorSelectorList = new Map();
       this.selectedFile = null;
+
+      this.editor.append(this.editorSelector);
+
+
+      this.editorSelector.addEventListener("click",function(event){
+        if(event.target.parentNode.className === "selector"){
+          this.editorSelectFile(event.target.parentNode._gd_oject);
+        }
+        
+      }.bind(this));
     }
     addEditorSelector(file){
 
       let selector = document.createElement("div");
       selector._contextmenu_type = "file";
       selector.className = "selector";
+      selector.innerHTML = file.name;
+      selector._gd_oject = file;
 
-      this.editorSelectorList.set(file);
+      let overlay = document.createElement("div");
+      overlay.style.position = "absolute";
+      overlay.style.top = "0";
+      overlay.style.left = "0";
+      overlay.style.height = "100%";
+      overlay.style.width = "100%";
+      //overlay
+      selector.appendChild(overlay);
+      this.editorSelectorList.set(file, selector);
       this.editorSelector.append(selector);
-
+    }
+    removeEditorSelector(file){
+      let selector = this.editorSelectorList.get(file);
+      this.editorSelectorList.delete(file);
+      this.editorSelector.removeChild(selector);
+    }
+    editorSelectFile(file){
+      if(this.selectedFile instanceof _gd_sandbox_file 
+        && this.selectedFile.isOpen){
+          this.selectedFile.editor.uiElement.style.zIndex = "0";
+          //toggleClass(this.editorSelectorList.get(this.selectedFile), "seleted");
+      }
+      this.selectedFile = file;
+      this.selectedFile.editor.uiElement.style.zIndex = "1";
+      //toggleClass(this.editorSelectorList.get(this.selectedFile), "seleted");
     }
     
 }

@@ -35,7 +35,7 @@ class _gd_sandbox_editor{
             this._hasFile = true;
             this._file = file;
             this._textArea.value = this.file.content;
-            this._file._gd_editor = this;
+            this._file.editor = this;
         }
         else{
             throw new Error("file is already open");
@@ -44,7 +44,7 @@ class _gd_sandbox_editor{
     removeFile(){
       if(this._hasFile){
           this._file.close();
-          this._file._gd_editor = null;
+          this._file.editor = null;
           this._file = null;
           this._hasFile = false;
       }
