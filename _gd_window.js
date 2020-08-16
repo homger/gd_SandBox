@@ -19,12 +19,17 @@ const DEFAULLT_PARAMETERS = {
   },
   controlPanelPadding: true,
 }
-
-document.addEventListener("readystatechange", function(){
+if(document.readyState === "complete"){
+  DEFAULLT_PARAMETERS.boundingBlock = document.body;
+}
+else{
+  console.warn("document.readyState === complete is false");
+}
+/*document.addEventListener("readystatechange", function(){
   if(document.readyState === "complete"){
     DEFAULLT_PARAMETERS.boundingBlock = document.body;
   }
-});
+});*/
 
 class _gd_window{
     constructor(htmlBlockElementToMove, parameters = DEFAULLT_PARAMETERS){
@@ -38,12 +43,12 @@ class _gd_window{
                 throw new Error("!boundingBlock.childNodes.includes(htmlBlockElementToMove) === false");
             }*/
             this.movingDiv = document.createElement("div");
-            this.default_z_index = parameters.default_z_index;
-            this.moving_z_index = parameters.moving_z_index;
+            this.default_z_index = this.parameters.default_z_index;
+            this.moving_z_index = this.parameters.moving_z_index;
             
             //debugger;
             this.initialTop = 0, this.initialLeft = 0;
-            this.top = 0, this.left = 0, this.boundingBlock = parameters.boundingBlock, 
+            this.top = 0, this.left = 0, this.boundingBlock = this.parameters.boundingBlock, 
             this.htmlBlockElementToMove = htmlBlockElementToMove, this._size = "mini";
             this.elementValidation(htmlBlockElementToMove);
 
