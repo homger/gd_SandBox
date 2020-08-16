@@ -58,6 +58,11 @@ class _gd_window{
             this.mouseUp = this.mouseUp.bind(this);
             this.mouseMove = this.mouseMove.bind(this);
             this.mouseDown = this.mouseDown.bind(this);
+            this.boundingBlock_scroll = this.boundingBlock_scroll.bind(this);
+
+            this.boundingBlock.addEventListener("scroll",
+            this.boundingBlock_scroll
+            );
 
             if(this._size == "mini")
                 this.movingDiv.addEventListener("mousedown", this.mouseDown);
@@ -71,6 +76,8 @@ class _gd_window{
             
             GD_WINDOW_LIST.push(this);
             this.mountControls();
+
+            return this;
     }
 
     refreshGeometry(){
@@ -78,10 +85,10 @@ class _gd_window{
         this.htmlBlockElementToMove_OffsetHeight = this.htmlBlockElementToMove.offsetHeight;
         this.htmlBlockElementToMove_OffsetWidth = this.htmlBlockElementToMove.offsetWidth;
 
-        this.maxY = this.boundingBlock.scrollHeight /*+ this.offsetTopLeft.top*/ - this.htmlBlockElementToMove_OffsetHeight;
+        this.maxY = this.boundingBlock.clientHeight /*+ this.offsetTopLeft.top*/ - this.htmlBlockElementToMove_OffsetHeight;
         console.log("this.boundingBlock.clientHeight : " + this.boundingBlock.clientHeight);
         console.log("this.boundingBlock.scrollHeight : " + this.boundingBlock.scrollHeight);
-        this.maxX = this.boundingBlock.scrollWidth /*+ this.offsetTopLeft.left*/ - this.htmlBlockElementToMove_OffsetWidth;
+        this.maxX = this.boundingBlock.clientWidth /*+ this.offsetTopLeft.left*/ - this.htmlBlockElementToMove_OffsetWidth;
         if(this.boundingBlock.clientHeight == 0){
           console.warn("boundingBlock.clientHeight == 0 is true. This 'could' posse some problems..");
         }
@@ -102,8 +109,8 @@ class _gd_window{
     }
 
     mouseMove(event){
-        this.top =  this.initialTop + event.pageY - this._mouseDownPositionY;
-        this.left = this.initialLeft + event.pageX - this._mouseDownPositionX;
+        this.top =  this.initialTop + event.pageY - this._mouseDownPositionY;// + this.boundingBlock.scrollTop;
+        this.left = this.initialLeft + event.pageX - this._mouseDownPositionX;// + this.boundingBlock.scrollLeft;
         console.log("minY :  " + this.minY + "      minX :  "  + this.minX);
         this.setPosition();
     }
@@ -115,14 +122,24 @@ class _gd_window{
           this._mouseDownPositionX = event.pageX;
           this._mouseDownPositionY = event.pageY;
           this.movingDiv.style.zIndex = this.moving_z_index;
+          this.deactivateTransitions();
           window.addEventListener("mousemove", this.mouseMove);
           window.addEventListener("mouseup", this.mouseUp);
         }
     }
     mouseUp(){
+        this.activateTransition();
         this.movingDiv.style.zIndex = this.default_z_index;
         window.removeEventListener("mousemove", this.mouseMove);
         window.removeEventListener("mouseup", this.mouseUp);
+    }
+
+    boundingBlock_scroll(event){
+      if(true){
+        //this.top += this.boundingBlock.scrollTop;
+        //this.left += this.boundingBlock.scrollLeft;
+        this.setPosition();
+      }
     }
 
     size_min(){
@@ -212,10 +229,13 @@ class _gd_window{
             htmlBlockElementToMove.style.zIndex = "0";
     }
     setPosition(){
+        
         this.limitTopLeft();
 
-        this.htmlBlockElementToMove.style.top = this.top + "px";
-        this.htmlBlockElementToMove.style.left = this.left + "px";
+        this.htmlBlockElementToMove.style.top = 
+        this.top + this.boundingBlock.scrollTop + "px";
+        this.htmlBlockElementToMove.style.left = 
+        this.left +  this.boundingBlock.scrollLeft + "px";
     }
     styleSetup(){
         this.movingDiv.className = "_gd_window";
@@ -230,6 +250,10 @@ class _gd_window{
         this.movingDiv.style.zIndex = this.default_z_index;
         this.htmlBlockElementToMove.style.position = "absolute";
         this.htmlBlockElementToMove.style.boxSizing = "border-box";
+
+        console.log("this.get_boundingBlockComputedWidthHeight().height :::  " 
+        + this.get_boundingBlockComputedWidthHeight().height);
+        //this.boundingBlock.style.height = this.get_boundingBlockComputedWidthHeight().height;
         
         if(this.parameters.controlPanelPadding){
           this.htmlBlockElementToMove.style.paddingTop = "50px";
@@ -259,6 +283,16 @@ class _gd_window{
       let width = liveCSS.getPropertyValue("width");
       let height = liveCSS.getPropertyValue("height");
       return {width,height};
+    }
+
+    deactivateTransitions(){
+      this.initialTransition = window.getComputedStyle(this.htmlBlockElementToMove).getPropertyValue("transition-property");
+      this.htmlBlockElementToMove.style.transitionProperty = "none";
+      console.log("this.initialTransition  ::" + 
+      this.initialTransition);
+    }
+    activateTransition(){
+      this.htmlBlockElementToMove.style.transitionProperty = this.initialTransition;
     }
 }
 function get_offsetXY(element){
