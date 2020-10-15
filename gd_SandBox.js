@@ -23,11 +23,13 @@ class gd_SandBox{
         this.projectsList = [];
         this.projectsNameList = [];
         this.projectCount = 0;
+        this.globalClassNameList = new Set();
+
         this.initialSetUp();
         
         //window.addEventListener("contextmenu", this.contextMenuCall);
         window.addEventListener("dblclick", this.dblclickCall);
-        this.___windowClick = this.___windowClick.bind(this);
+        
         this.removeContextMenu = this.removeContextMenu.bind(this);
         this._preventDefault = this._preventDefault.bind(this);
 
@@ -46,10 +48,22 @@ class gd_SandBox{
       this.nav.innerHTML = "<ul></ul>";
       this.ul = this.nav.querySelector("ul");;
       this.contextMenuNameList = [];
+
+
       this.contextMenuSetup();
+      this.clickSetup();
       this.dblclickSetup();
       this.editorSetup();
-      
+    }
+
+    globalClassNameList_setUp(){
+      this.globalClassNameList.add("selector");
+      this.globalClassNameList.add("editor-selector");
+      this.globalClassNameList.add("folder");
+    }
+
+    clickSetup(){
+
     }
     
     newProject(name){
@@ -123,60 +137,7 @@ class gd_SandBox{
       //projectData.project.uiElement.addEventListener("click",this.navClick.bind(this));
 
     }
-
-    contextMenuCall(event){
-      console.log(event.screenX);
-      
-      let gd_object = event.target;
-      let length = this.contextMenuNameList.length;
-      while(true){
-        console.log("ITé --");
-        for(let i = 0; i< length; ++i){
-          if(hasClass(gd_object, this.contextMenuNameList[i])){
-            
-            this.contextMenu_ChoosenElement = gd_object._gd_oject;
-            console.log(gd_object);
-            this.contextMenuPop(this.contextMenu_ChoosenElement,
-              {
-                x: event.pageX,
-                y: event.pageY,
-              });
-              event.preventDefault();
-              return;
-          }
-        }
-        gd_object = gd_object.parentNode;
-        if(gd_object.tagName == "BODY" || gd_object.tagName == "body")
-          return;
-      }
-    }
-    contextMenuPop(gd_element, xy){
-      console.log(gd_element.uiElement._contextmenu_type);
-
-      this.chosenContextMenu = this.contextMenuList[gd_element.uiElement._contextmenu_type];
-      this.openedContextmenuType = gd_element.uiElement._contextmenu_type;
-
-      document.body.appendChild(this.chosenContextMenu);
-
-      let _xy = this.contextMenuBounding(xy);
-      this.chosenContextMenu.style.top = _xy.y + "px";
-      this.chosenContextMenu.style.left = _xy.x + "px";
-
-      window.addEventListener("mousedown", this.___windowClick);
-    }
-
-    ___windowClick(event){
-      if(event.target.parentNode === this.chosenContextMenu 
-        || event.target === this.chosenContextMenu){
-          return;
-        }
-      document.body.removeChild(this.chosenContextMenu);
-      window.removeEventListener("mousedown", this.___windowClick);
-    }
-    removeContextMenu(){
-      document.body.removeChild(this.chosenContextMenu);
-      window.removeEventListener("mousedown", this.___windowClick);
-    }
+    
 
     navClick(event){
       console.log(" click");
@@ -194,22 +155,6 @@ class gd_SandBox{
         path.pop();
         
       return path;
-    }
-
-    contextMenuBounding({x,y}){
-      let _y = y + this.chosenContextMenu.offsetHeight - document.documentElement.offsetHeight;
-      let _x = x + this.chosenContextMenu.offsetWidth - document.documentElement.offsetWidth;
-      console.log("_y  :  " + _y);
-      if(_y > 0)
-        _y  = y - _y;
-      else
-        _y = y;
-      if(_x > 0)
-      _x  = x - _x;
-      else
-        _x = x;
-        
-      return {x:_x,y:_y};
     }
     contextMenuSetup(){
       //
@@ -229,6 +174,10 @@ class gd_SandBox{
       this.contextMenu.addOption("folder",["Remove folder", function(uiElementCaller){
         this.contextMenu_ChoosenElement =  uiElementCaller._gd_oject;
         this.contextMenu_ChoosenElement.removeFolder();
+      }.bind(this)]);
+      this.contextMenu.addOption("folder",["New File", function(uiElementCaller){
+        this.contextMenu_ChoosenElement =  uiElementCaller._gd_oject;
+        this.contextMenu_ChoosenElement.newFile(prompt("New File name", "N/A"), "text/plain");
       }.bind(this)]);
       
       
@@ -264,60 +213,10 @@ class gd_SandBox{
 
         }.bind(this), "close-file"],
       ], ["file","selector"]);
-      /*
-      this.contextMenuList = [];
-      
-      this.contextMenuMake("folder",[
-        ["New Folder", function(){
-          this.contextMenu_ChoosenElement.newFolder(prompt("New Folder name", "N/A"));
-        }.bind(this), "add-folder"],
-        ["Remove folder", function(){
-          this.contextMenu_ChoosenElement.removeFolder();
-        }.bind(this), "remove-folder"],
-      ]);
-      
-      this.contextMenuMake("file",[
-        ["Remove file", function(){
-          if(this.contextMenu_ChoosenElement.isOpen){
-            this.closeFile(this.contextMenu_ChoosenElement);
-          }
-          this.contextMenu_ChoosenElement.removeFile();
-        }.bind(this), "remove-file"],
-        ["Open file", function(){
-          this.openFile(this.contextMenu_ChoosenElement);
-        }.bind(this), "open-file"],
-        ["Close file", function(){
-          this.closeFile(this.contextMenu_ChoosenElement);
-        }.bind(this), "close-file"],
-      ]);
-      */
-
       }
     
     _preventDefault(event){
       event.preventDefault();
-    }
-    contextMenuMake(contextMenuName, options){
-      this.contextMenuNameList.push(contextMenuName);
-      this.contextMenuList[contextMenuName] = document.createElement("div");
-      this.contextMenuList[contextMenuName].className = "context-menu";
-
-      this.contextMenuList[contextMenuName].addEventListener("contextmenu",this._preventDefault);
-
-      let cach;
-      options.forEach((option) => {
-        cach = document.createElement("div");
-        cach.innerHTML = option[0];
-        cach.onclick = function(){
-          this.removeContextMenu();
-          option[1]();
-        }.bind(this);
-        if(typeof option[3] === "string")
-          cach.className = option[3];
-        
-          this.contextMenuList[contextMenuName].append(cach);
-      });
-
     }
     dblclickSetup(){
       this.dblclickNameList = [];
