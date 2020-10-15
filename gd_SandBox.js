@@ -12,38 +12,45 @@ const folderClassName = "folder";
 
 class gd_SandBox{
 
-    constructor(parameters = PARAMETERS_DEFAULT_VALUE){
-        this.contextMenuCall = this.contextMenuCall.bind(this);
+    constructor(globalContainer){//parameters = PARAMETERS_DEFAULT_VALUE){
+        
         this.dblclickCall = this.dblclickCall.bind(this);
 
-        this.parameters = objectDefaultValue(parameters, PARAMETERS_DEFAULT_VALUE);
+        this.parameters = PARAMETERS_DEFAULT_VALUE;//objectDefaultValue(parameters, PARAMETERS_DEFAULT_VALUE);
         
         this.editorList = new Map();
+        this.globalContainer = globalContainer;
 
         this.projectsList = [];
         this.projectsNameList = [];
         this.projectCount = 0;
         this.globalClassNameList = new Set();
 
+        
         this.initialSetUp();
         
-        //window.addEventListener("contextmenu", this.contextMenuCall);
+        
         window.addEventListener("dblclick", this.dblclickCall);
         
-        this.removeContextMenu = this.removeContextMenu.bind(this);
+        
         this._preventDefault = this._preventDefault.bind(this);
 
     }
 
     initialSetUp(){
       console.log("initialSetUp");
-      UI_ELEMENTS_NAME.forEach(function(name){
-        if(this.parameters[name] !== null){
 
-          this.parameters[name].innerHTML = "";
-          this[name] = this.parameters[name];
-        }
-      }.bind(this));
+      this.main = document.createElement("main");
+      this.main.className = "gd_sandBox";
+      this.globalContainer.append(this.main);
+
+      this.nav = document.createElement("nav");
+      this.header = document.createElement("header");
+      this.editor = document.createElement("section");
+      this.footer = document.createElement("footer");
+
+
+      UI_ELEMENTS_NAME.forEach(name => this.main.append(this[name]));
 
       this.nav.innerHTML = "<ul></ul>";
       this.ul = this.nav.querySelector("ul");;
@@ -60,6 +67,7 @@ class gd_SandBox{
       this.globalClassNameList.add("selector");
       this.globalClassNameList.add("editor-selector");
       this.globalClassNameList.add("folder");
+      this.globalClassNameList.add("gd_sandBox");
     }
 
     clickSetup(){
