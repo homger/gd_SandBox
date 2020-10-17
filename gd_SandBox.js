@@ -39,6 +39,17 @@ class gd_SandBox{
 
     initialSetUp(){
       console.log("initialSetUp");
+      this.contextMenuNameList = [];
+
+
+      this.buildUi();
+
+      this.contextMenuSetup();
+      this.clickSetup();
+      this.dblclickSetup();
+      this.editorSetup();
+    }
+    buildUi(){
 
       this.main = document.createElement("main");
       this.main.className = "gd_sandBox";
@@ -49,31 +60,47 @@ class gd_SandBox{
       this.editor = document.createElement("section");
       this.footer = document.createElement("footer");
 
+      this.nav.className = "gd_sandBox_nav";
+      this.header.className = "gd_sandBox_header";
+      this.editor.className = "gd_sandBox_editor";
+      this.footer.className = "gd_sandBox_footer";
+
 
       UI_ELEMENTS_NAME.forEach(name => this.main.append(this[name]));
 
       this.nav.innerHTML = "<ul></ul>";
-      this.ul = this.nav.querySelector("ul");;
-      this.contextMenuNameList = [];
+      this.ul = this.nav.querySelector("ul");
 
+      this.viewWindow = document.createElement("div");
+      this.viewWindow.className = "gd_sandBox_viewWindow";
 
-      this.contextMenuSetup();
-      this.clickSetup();
-      this.dblclickSetup();
-      this.editorSetup();
+      this.main.append(this.viewWindow);
+      this.viewWindow_gd_window_object = new _gd_window(this.viewWindow, {boundingBlock: this.main, default_z_index: 99});
+      
+      this.viewer = _gd_sandbox_viewer("gd_viewer");
+      this.viewWindow.append(this.viewer);
+
     }
-
     globalClassNameList_setUp(){
       this.globalClassNameList.add("selector");
       this.globalClassNameList.add("editor-selector");
       this.globalClassNameList.add("folder");
       this.globalClassNameList.add("gd_sandBox");
+      this.globalClassNameList.add("gd_sandBox_nav");
+      this.globalClassNameList.add("gd_sandBox_header");
+      this.globalClassNameList.add("gd_sandBox_editor");
+      this.globalClassNameList.add("gd_sandBox_footer");
     }
 
     clickSetup(){
-
+      this._clickFunction = this._clickFunction.bind(this);
+      this.main.addEventListener("click", this._clickFunction);
     }
     
+    _clickFunction(event){
+
+    }
+
     newProject(name){
         if(!(typeof name == "string")){
             name = "N/A";
