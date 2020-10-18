@@ -14,6 +14,7 @@ class gd_SandBox{
 
     constructor(globalContainer){//parameters = PARAMETERS_DEFAULT_VALUE){
         
+        this.test = this.test.bind(this);
         this.dblclickCall = this.dblclickCall.bind(this);
 
         this.parameters = PARAMETERS_DEFAULT_VALUE;//objectDefaultValue(parameters, PARAMETERS_DEFAULT_VALUE);
@@ -75,11 +76,11 @@ class gd_SandBox{
       this.viewWindow.className = "gd_sandBox_viewWindow";
 
       this.main.append(this.viewWindow);
-      this.viewWindow_gd_window_object = new _gd_window(this.viewWindow, {boundingBlock: this.main, default_z_index: 99});
+      this.viewWindow_gd_window_object = new _gd_window(this.viewWindow, {boundingBlock: this.main, default_z_index: -1});
       
       this.viewer = _gd_sandbox_viewer("gd_viewer");
       this.viewWindow.append(this.viewer);
-
+      
     }
     globalClassNameList_setUp(){
       this.globalClassNameList.add("selector");
@@ -296,8 +297,15 @@ class gd_SandBox{
         this.editor.append(_editor.uiElement);
         this.addEditorSelector(file);
         this.editorSelectFile(file);
+
+        file.addEventListener("filechange", this.test);
       }
     }
+
+    test(fileEvent){
+      this.viewer.setDocument(fileEvent.content);
+    }
+
     closeFile(file){
       if(file.isOpen){
 
@@ -306,6 +314,7 @@ class gd_SandBox{
           this.editorList.delete(file);
           this.editor.removeChild(_editor.uiElement);
           this.removeEditorSelector(file);
+          file.removeEventListener("filechange", this.test);
         }
     }
 

@@ -80,6 +80,10 @@ class _gd_window{
             });
             
             this.htmlBlockElementToMove.addEventListener("scroll",this.scrollFix.bind(this));
+
+            this.observer = new ResizeObserver(() => {this.refreshGeometry()});
+
+            this.observer.observe(this.htmlBlockElementToMove, {box: "border-box"});
             
             GD_WINDOW_LIST.push(this);
             this.mountControls();
