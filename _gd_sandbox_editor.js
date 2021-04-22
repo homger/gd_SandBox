@@ -4,40 +4,41 @@ class _gd_sandbox_editor{
     constructor(){
 
         this._hasFile = false;
-        this._textArea = document.createElement("textarea");
-        this._textArea.className = "editor";
-
+        this._editor = document.createElement("pre");
+        this._editor.className = "editor";
+        this._editor.contentEditable = true;
+        
         this.keyActionSetup();
         
         this.keyAction = this.keyAction.bind(this);
         
         
-        this._textArea.addEventListener("keyup", function(){
-            this._file.content = this._textArea.value;
-            console.log(`slect start:  ${this._textArea.selectionStart} || slect end: ${this._textArea.selectionEnd}`);
+        this._editor.addEventListener("keyup", function(){
+            this._file.content = this._editor.textContent;
+            console.log(`slect start:  ${this._getSelector().anchorOffset} || slect end: ${this._getSelector().focusOffset}`);
         }.bind(this));
-        this._textArea.addEventListener("keydown", this.keyAction);
+        this._editor.addEventListener("keydown", this.keyAction);
 
-        this.uiElement = this._textArea;
+        this.uiElement = this._editor;
     }
     get cursorIndex(){
-        return this._textArea.selectionStart == this._textArea.selectionEnd ? this._textArea.selectionEnd : undefined;
+        return this._getSelector().anchorOffset == this._getSelector().focusOffset ? this._getSelector().focusOffset : undefined;
     }
     
     set cursorIndex(index){
         /*if(index > this.textAreaValueLength){
-            this._textArea.selectionStart = this.textAreaValueLength - 1;
-            this._textArea.selectionEnd = this.textAreaValueLength - 1;
+            this._textArea.anchorOffset = this.textAreaValueLength - 1;
+            this._textArea.focusOffset = this.textAreaValueLength - 1;
         }*/
-        this._textArea.selectionStart += index;
-        this._textArea.selectionEnd += index;
+        this._getSelector().anchorOffset += index;
+        this._getSelector().focusOffset += index;
     }
     /*moveCursorIndex(index){
-        this._textArea.selectionStart = index;
-        this._textArea.selectionEnd = index;
+        this._textArea.anchorOffset = index;
+        this._textArea.focusOffset = index;
     }*/
     get textAreaValueLength(){
-        return this._textArea.value.length;
+        return this._editor.textContent.length;
     }
     /*get textAreaValue(){
         return this._textArea.value;
@@ -46,34 +47,45 @@ class _gd_sandbox_editor{
         return this._textArea.value = value;
     }*/
     get charAt(){
-        return this._textArea.value[index];
+        return this._editor.textContent[index];
+    }
+    _getSelector(){
+        if(document.activeElement === this._editor)
+            return window.getSelection();
+        return undefined;
     }
     get selectionActive(){
-        return this._textArea.selectionStart == this._textArea.selectionEnd ? false : true;
+        return this._getSelector().anchorOffset == this._getSelector().focusOffset ? false : true;
     }
-    get selectionStart(){
-        return this._textArea.selectionStart;
+    get anchor_focus_offset(){
+        return {
+            anchorOffset: this.anchorOffset,
+            focusOffset: this.focusOffset,
+        }
     }
-    set selectionStart(s_start){
-        return this._textArea.selectionStart = s_start;
+    get anchorOffset(){
+        return this._getSelector().anchorOffset;
     }
-    get selectionEnd(){
-        return this._textArea.selectionEnd;
+    set anchorOffset(s_start){
+        return this._getSelector().anchorOffset = s_start;
     }
-    set selectionEnd(s_end){
-        return this._textArea.selectionEnd = s_end;
+    get focusOffset(){
+        return this._getSelector().focusOffset;
+    }
+    set focusOffset(s_end){
+        return this._getSelector().focusOffset = s_end;
     }
     set className(className){
-        this._textArea.className = className;
+        this._editor.className = className;
     }
     get className(){
-        return this._textArea.className;
+        return this._editor.className;
     }
     set id(id){
-        this._textArea.id = id;
+        this._editor.id = id;
     }
     get id(){
-        return this._textArea.id;
+        return this._editor.id;
     }
     set file(file){
         //_gd_sandbox_file_isValid(file);
@@ -84,7 +96,7 @@ class _gd_sandbox_editor{
         if(file.open()){
             this._hasFile = true;
             this._file = file;
-            this._textArea.value = this.file.content;
+            this._editor.textContent = this.file.content;
             this._file.editor = this;
         }
         else{
@@ -119,21 +131,40 @@ class _gd_sandbox_editor{
         
     }
     print(printValue, cursorOffset){
-        const {selectionStart, selectionEnd} = this._textArea;
-        let value = this._textArea.value;
+        const {anchorOffset, focusOffset} = this.anchor_focus_offset;
+        let value = this._editor.textContent;
 
-        if(selectionStart != selectionEnd){
-            this._textArea.value = `${value.slice(0,selectionStart)}${printValue}${value.slice(selectionEnd)}`;
+        if(anchorOffset != focusOffset){
+            if(anchorOffset - focusOffset > 0)
+                this._editor.textContent = `${value.slice(0,focusOffset)}${printValue}${value.slice(anchorOffset)}`;
+            else
+                this._editor.textContent = `${value.slice(0,anchorOffset)}${printValue}${value.slice(focusOffset)}`;
+        
+        
+        
+            this._getSelector().removeAllRanges();
+            
+            let range = document.createRange();
+            range.setStart(this._editor, anchorOffset + printValue.length + cursorOffset);
+            this._getSelector().addRange(range);
 
-            this._textArea.selectionEnd = selectionStart + printValue.length + cursorOffset;
-            this._textArea.selectionStart = selectionStart + printValue.length + cursorOffset;
+            //this._getSelector().focusOffset = anchorOffset + printValue.length + cursorOffset;
+            //this._getSelector().anchorOffset = anchorOffset + printValue.length + cursorOffset;
             return;
         }
         
-        this._textArea.value = `${value.slice(0,selectionStart)}${printValue}${value.slice(selectionStart)}`;
+        this._editor.textContent = `${value.slice(0,anchorOffset)}${printValue}${value.slice(anchorOffset)}`;
+        
+        
+        
+        this._getSelector().removeAllRanges();
+        
+        let range = document.createRange();
+        range.setStart(this._editor, anchorOffset + printValue.length + cursorOffset);
+        this._getSelector().addRange(range);
 
-        this._textArea.selectionEnd = selectionEnd + printValue.length + cursorOffset;
-        this._textArea.selectionStart = selectionStart + printValue.length + cursorOffset;
+        //this._getSelector().focusOffset = focusOffset + printValue.length + cursorOffset;
+        //this._getSelector().anchorOffset = anchorOffset + printValue.length + cursorOffset;
         
 
         //console.log(value);
