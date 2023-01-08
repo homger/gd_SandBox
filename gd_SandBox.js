@@ -303,7 +303,8 @@ class gd_SandBox{
     }
 
     test(fileEvent){
-      this.viewer.setDocument(fileEvent.content);
+      console.log("FILE EVENT TEST");
+      this.viewer.setDocument(fileEvent.editor);
     }
 
     closeFile(file){

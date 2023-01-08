@@ -44,12 +44,14 @@ const vrCursor = {
                 this.line = !isNaN(valid_anchor._line_number)?  valid_anchor._line_number : this.line;
                 this.index = currentSelection.anchorOffset;
                 console.log("line :  " + this.line + "       index :  " + this.index);
+                break;
             case "filteredSelector":
                 
                 this.sloted_gd_sandbox_editor.__filteredSelectorObjectUpToDate = false;
                 this.line = this.sloted_gd_sandbox_editor.filteredSelector().startLine;
                 this.index = this.sloted_gd_sandbox_editor.filteredSelector().startIndex;
                 console.log("line :  " + this.line + "       index :  " + this.index);
+                break;
             case "previousData":
                 
                 this.line = this.sloted_gd_sandbox_editor.lineBeforUnslot;
@@ -62,8 +64,10 @@ const vrCursor = {
         switch(element){
             case "index":
                 this.index = currentSelection.anchorOffset;
+                break;
             case "carret":
                 this.sloted_gd_sandbox_editor.__updateCursorPosition();
+                break;
             default: return;
         }
     },
@@ -209,7 +213,7 @@ class _gd_sandbox_editor{
 
     getDataAsString(){
         let dataString = "";
-        this._lineArray.forEach((line) => {dataString += line.basicTextData;} );
+        this._lineArray.forEach((line) => {dataString += line.basicTextData + "\n";} );
 
         return dataString;
     }
@@ -366,12 +370,45 @@ class _gd_sandbox_editor{
         if(file.open()){
             this._hasFile = true;
             this._file = file;
-            this._editor.textContent = this.file.content;
+            //this._editor.textContent = this.file.content;
+            this.parseFile();
             this._file.editor = this;
         }
         else{
             throw new Error("file is already open");
         }
+    }
+    parseFile(){
+
+        let dataString = this.split_string_by_line_break(this._file._content);
+
+        dataString.forEach(string => console.log("'" + string + "'"));
+        
+        console.log("Paste data  lenght:  "  + dataString.length);
+        
+        //debugger;
+        
+        if(dataString.length == 1){
+            
+            this.newLine( new _line(dataString[0]))
+            //this.__print(dataString[0]);
+        }
+        else if(dataString.length > 1){
+            
+            
+            
+            for(let i = 0; i < dataString.length; ++i){
+                /*if(i > 0){
+                    this.splitLine();
+                    vrCursor.down();
+                    vrCursor.home();
+                } 
+                this.__print(dataString[i]);*/
+                this.newLine( new _line(dataString[i]));
+            }
+        
+            //vrCursor.update("carret");
+        }        
     }
     removeFile(){
       if(this._hasFile){
@@ -810,6 +847,8 @@ class _gd_sandbox_editor{
         
         this.__filteredSelectorObjectUpToDate = false;
         //alert(keyboardEvent.key);*/
+
+        this.file.content = this.getDataAsString();
     }
     keyCombinationKeyAction(keyboardEvent){
         if(keyboardEvent.repeat){
