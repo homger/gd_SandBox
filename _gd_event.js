@@ -1,5 +1,20 @@
 'use strict';
 
+
+/*
+
+__addEventType does what it says:
+
+name = name of the new type of event;
+eventObjectNameArray = name of the member varaible or function to be dispatched 
+with the event object like : keyboardEvent.key.
+
+Variable and function inside eventObjectNameArray should exist inside the class that extends _gd_event
+
+need to make a version that does not need to extend _gd_event
+
+
+*/
 class _gd_event{
     constructor(){
 
