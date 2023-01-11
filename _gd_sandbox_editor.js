@@ -147,7 +147,7 @@ class vrCursor{
         }
     }*/
     _apply_lineOffset(){
-        this.moveLineX(this._indexOffset);
+        this.moveLineX(this._lineOffset);
         this._lineOffset = 0;
     }
     _apply_indexOffset(){
@@ -822,6 +822,8 @@ class _gd_sandbox_editor{
         this.addKeyCombination(["Control","v"]);
         this.addKeyCombination(["AltGraph","{"]);
         this.addKeyCombination(["AltGraph","}"]);
+        this.addKeyCombination(["Control", "Alt","{"]);
+        this.addKeyCombination(["Control", "Alt","}"]);
         //this.addKeyCombination(["Control","c"]);
         //this.addKeyCombination( function(){this.__print("Super combination");}.bind(this) , "Control","Alt","t","x"); Does not work. Will not make it work
 
@@ -881,6 +883,7 @@ class _gd_sandbox_editor{
 
         this.addKeyActionException("F5");
         this.addKeyActionException("F12");
+        //this.addKeyActionException("AltGraph");
         
 
     }
@@ -943,20 +946,18 @@ class _gd_sandbox_editor{
     }
 
     classicKeyAction(keyboardEvent){
-            
+        
         _slot_keyAction_call();
 
         
-        //debugger;
+        
         let key = this.keyActionMap.get(keyboardEvent.key);
         console.log("VR C INDEX BEFORE UPDATE: " + this.vrCursor.index);
         //keyboardEvent.preventDefault();
         if(key){
-            if(key.cursorOffset){
-                this.vrCursor._indexOffset += key.cursorOffset;
-            }
 
             if(key.keyCombination){
+                //debugger;
                 this.genericKeyAction = this.keyCombinationKeyAction.bind(this);
                 this.combination_Starter_Keys.set(keyboardEvent.key, {down: true});   
                 ++this.combination_Starter_Keys_down_count;
@@ -992,7 +993,10 @@ class _gd_sandbox_editor{
                 keyboardEvent.preventDefault();
                 //debugger;
                 if(key.cursorOffset){
-                    this.__print(key.printValue, key.cursorOffset);
+                    this.__print(key.printValue);
+                    this.vrCursor._indexOffset += key.cursorOffset;
+                    this.vrCursor.applyOffset();
+                    this.vrCursor.update("carret");
                 }
                 else{
                     this.__print(key.printValue);
@@ -1017,8 +1021,8 @@ class _gd_sandbox_editor{
         //vrCursor.updateFrom("anchor_selection");
 
         
-        this.vrCursor.applyOffset();
-        this.vrCursor.update("carret");
+        
+        
         _slot_keyAction_add(this.vrCursor.updateFrom, "anchor_selection");
         
         this.__filteredSelectorObjectUpToDate = false;
@@ -1027,6 +1031,7 @@ class _gd_sandbox_editor{
         this.file.content = this.getDataAsString();
     }
     keyCombinationKeyAction(keyboardEvent){
+        //debugger;
         if(keyboardEvent.repeat){
             keyboardEvent.preventDefault();
             return;
