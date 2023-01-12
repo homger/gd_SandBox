@@ -820,10 +820,10 @@ class _gd_sandbox_editor{
         this.addKeyCombination(["Control","a"], this.selectAll.bind(this));
         this.addKeyCombination(["Control","c"]);
         this.addKeyCombination(["Control","v"]);
-        this.addKeyCombination(["AltGraph","{"]);
+        /*this.addKeyCombination(["AltGraph","{"]);
         this.addKeyCombination(["AltGraph","}"]);
         this.addKeyCombination(["Control", "Alt","{"]);
-        this.addKeyCombination(["Control", "Alt","}"]);
+        this.addKeyCombination(["Control", "Alt","}"]);*/
         //this.addKeyCombination(["Control","c"]);
         //this.addKeyCombination( function(){this.__print("Super combination");}.bind(this) , "Control","Alt","t","x"); Does not work. Will not make it work
 
@@ -962,51 +962,8 @@ class _gd_sandbox_editor{
                 this.combination_Starter_Keys.set(keyboardEvent.key, {down: true});   
                 ++this.combination_Starter_Keys_down_count;
             }
-            else if(this.selectionActive){
-                if(key.wrapText){
-                    keyboardEvent.preventDefault();
-                    if(key.printBrut){
-                        this.__wrapSelection_brut(this._getSelector(), key.beforeWrapValue, key.afterWrapValue);
-                    }
-                    else{
-                        this.__wrapSelection(this.filteredSelector(), key.beforeWrapValue, key.afterWrapValue);
-                    }
-                    
-                }
-                else if(key.printKey){
-                    keyboardEvent.preventDefault();
-                    this.deleteSelection();
-                    if(key.printBrut){
-                        this.__print_brut(key.printValue);
-                    }
-                    else{
-                        this.__print(key.printValue);
-                    }
-                    
-                }
-                else if(key.specialAction){
-                    keyboardEvent.preventDefault();
-                    key.specialFunction();
-                }
-            }
-            else if(key.printKey){
-                keyboardEvent.preventDefault();
-                //debugger;
-                if(key.cursorOffset){
-                    this.__print(key.printValue);
-                    this.vrCursor._indexOffset += key.cursorOffset;
-                    this.vrCursor.applyOffset();
-                    this.vrCursor.update("carret");
-                }
-                else{
-                    this.__print(key.printValue);
-                }
-            }
-            else if(key.specialAction){
-                keyboardEvent.preventDefault();
-                key.specialFunction();
-
-            }
+            else
+             this.classicKeyAction_SubFunction(key, keyboardEvent);
         }
         else if(keyboardEvent.key.length == 1 && keyboardEvent.key.search(VALID_BASIC_TEXT_DATA_VALUES__AS_REGXP) == 0){
             keyboardEvent.preventDefault();
@@ -1030,6 +987,56 @@ class _gd_sandbox_editor{
 
         this.file.content = this.getDataAsString();
     }
+
+    //Don't know how to name it, making this to not replicate code inside keyCombinationKeyAction();
+    classicKeyAction_SubFunction(key, keyboardEvent){
+        if(this.selectionActive){
+            if(key.wrapText){
+                keyboardEvent.preventDefault();
+                if(key.printBrut){
+                    this.__wrapSelection_brut(this._getSelector(), key.beforeWrapValue, key.afterWrapValue);
+                }
+                else{
+                    this.__wrapSelection(this.filteredSelector(), key.beforeWrapValue, key.afterWrapValue);
+                }
+                
+            }
+            else if(key.printKey){
+                keyboardEvent.preventDefault();
+                this.deleteSelection();
+                if(key.printBrut){
+                    this.__print_brut(key.printValue);
+                }
+                else{
+                    this.__print(key.printValue);
+                }
+                
+            }
+            else if(key.specialAction){
+                keyboardEvent.preventDefault();
+                key.specialFunction();
+            }
+        }
+        else if(key.printKey){
+            keyboardEvent.preventDefault();
+            //debugger;
+            if(key.cursorOffset){
+                this.__print(key.printValue);
+                this.vrCursor._indexOffset += key.cursorOffset;
+                this.vrCursor.applyOffset();
+                this.vrCursor.update("carret");
+            }
+            else{
+                this.__print(key.printValue);
+            }
+        }
+        else if(key.specialAction){
+            keyboardEvent.preventDefault();
+            key.specialFunction();
+
+        }
+    }
+    
     keyCombinationKeyAction(keyboardEvent){
         //debugger;
         if(keyboardEvent.repeat){
@@ -1059,6 +1066,10 @@ class _gd_sandbox_editor{
             else{
                 this.combinationActionPending = false;
             }
+        }
+        let key = this.keyActionMap.get(keyboardEvent.key);
+        if(key){
+            this.classicKeyAction_SubFunction(key, keyboardEvent);
         }
         keyboardEvent.preventDefault();
         console.log("this.combination_Starter_Keys_down_count : " + this.combination_Starter_Keys_down_count);
