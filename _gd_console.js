@@ -10,6 +10,26 @@ class _gd_console{
         newPrintOut.innerHTML = data;
         this.container.append(newPrintOut);
     }
+
+    //simpleText for now
+    log(...newData){
+        let newPrintOut;
+        newData.forEach((data) => {
+            newPrintOut = document.createElement("div")
+            newPrintOut.innerHTML = data;
+            newPrintOut.className = "_gd_console_log";
+            this.container.append(newPrintOut);
+        });
+    }
+    error(...newData){
+        let newPrintOut;
+        newData.forEach((data) => {
+            newPrintOut = document.createElement("div")
+            newPrintOut.innerHTML = data;
+            newPrintOut.className = "_gd_console_error";
+            this.container.append(newPrintOut);
+        });
+    }
 }
 
 function testConole (output, ...dataArray){
