@@ -306,9 +306,22 @@ class gd_SandBox{
       }
     }
 
+    bundleProject(){
+
+    }
+
+    
+
     test(fileEvent){
       console.log("FILE EVENT TEST");
-      this.viewer.setDocument("<script>window.console = window.parent._gd_SandBox.console;</script>" + fileEvent.content);
+      //this.viewer.setDocument("<script>window.console = window.parent._gd_SandBox.console;</script>" + fileEvent.content);
+      test_wrapJavascript(fileEvent.content, this.test_wraped_reciveFile.bind(this));
+      console.log("test(fileEvent){");
+    }
+
+    test_wraped_reciveFile(fileString){
+      console.log("test_wraped_reciveFile(fileString){");
+      this.viewer.setDocument(fileString);
     }
 
     closeFile(file){

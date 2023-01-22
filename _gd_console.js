@@ -19,6 +19,7 @@ class _gd_console{
             newPrintOut.innerHTML = data;
             newPrintOut.className = "_gd_console_log";
             this.container.append(newPrintOut);
+            newPrintOut.scrollIntoView();
         });
     }
     error(...newData){
@@ -28,6 +29,7 @@ class _gd_console{
             newPrintOut.innerHTML = data;
             newPrintOut.className = "_gd_console_error";
             this.container.append(newPrintOut);
+            newPrintOut.scrollIntoView();
         });
     }
 }
