@@ -315,7 +315,11 @@ class gd_SandBox{
     test(fileEvent){
       console.log("FILE EVENT TEST");
       //this.viewer.setDocument("<script>window.console = window.parent._gd_SandBox.console;</script>" + fileEvent.content);
-      test_wrapJavascript(fileEvent.content, this.test_wraped_reciveFile.bind(this));
+      //test_wrapJavascript(fileEvent.content, this.test_wraped_reciveFile.bind(this));
+      test_wrapJavascript(fileEvent.content).then((fileStr) => {
+        console.log("THEN ");
+        this.viewer.setDocument(fileStr);
+      });
       console.log("test(fileEvent){");
     }
 

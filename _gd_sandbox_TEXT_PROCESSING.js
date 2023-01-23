@@ -17,20 +17,16 @@ onmessage = function(message){
 `);
 
 console.log(test_wrapJavascript_file.content);
-//let test_wrapJavascript_file_URL = test_wrapJavascript_file.url();
-//const test_wrapJavascript_worker = new Worker("./workerScripts/test_wrapJavascript_file.js",{});
-const test_wrapJavascript_worker = test_wrapJavascript_file.worker(); ///new Worker(test_wrapJavascript_file_URL);
 
-test_wrapJavascript_worker.onmessage = function(message){
-    test_wrapJavascript_calling_function(message.data);
-}
-var test_wrapJavascript_calling_function = function(){};
-
-function test_wrapJavascript(jsData, callingF){
+const test_wrapJavascript_worker = test_wrapJavascript_file.worker();
+function test_wrapJavascript(jsData){
     
     //debugger;
-    test_wrapJavascript_calling_function = callingF;
-    test_wrapJavascript_worker.postMessage(jsData);
+
+    return new Promise(function(resolve, reject){
+        test_wrapJavascript_worker.postMessage(jsData);
+        test_wrapJavascript_worker.onmessage = (message) => resolve(message.data);    
+    });
 }
 
 

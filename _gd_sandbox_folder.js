@@ -294,6 +294,10 @@ class _gd_sandbox_folder{
         file.parentFolder = this;
       });
     }
+
+    async searchFile(fileName){
+
+    }
 }
 
 
