@@ -125,6 +125,7 @@ class gd_SandBox{
             
             ++this.projectCount;
             this.mountProjects();
+            newproject._gd_parrent = this;
             return newproject;
         }
     }
@@ -411,6 +412,11 @@ class gd_SandBox{
     
 }
 
+async function gd_search(searchStr){
+
+}
+
+const gd_search_worker_file = new _gd_sandbox_file("gd_search_worker_file", "text/javascript");
 
 
 /*

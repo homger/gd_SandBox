@@ -2,8 +2,9 @@
 
 
 
-class _gd_sandbox_project{
+class _gd_sandbox_project extends _gd_event{
     constructor(project_name, projectFolder = new _gd_sandbox_folder(project_name, "div") ){
+      super();
         if( !(typeof project_name == "string") )
             throw new TypeError('typeof project_name == "string"');
         
