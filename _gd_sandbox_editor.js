@@ -933,6 +933,10 @@ class _gd_sandbox_editor{
             printKey: true, printValue: "()", 
             wrapText: true, beforeWrapValue:"(", afterWrapValue:")",
             cursorOffset: -1});
+        this.addKeyAction("{", {
+            printKey: true, printValue: "{}", 
+            wrapText: true, beforeWrapValue:"{", afterWrapValue:"}",
+            cursorOffset: -1});
         //this.addKeyAction("Backspace", {specialAction: true, specialFunction: function(textArea){}});
         this.addKeyAction("Enter", {specialAction: true, specialFunction: () => {this.splitLine(); this.vrCursor.down(); this.vrCursor.home(); this.vrCursor.update("carret");}});
         this.addKeyAction("²", {

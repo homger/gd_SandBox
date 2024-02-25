@@ -1,5 +1,13 @@
 'use strict';
 
+/*
+Will use this file temporarly to make "Virtual Worker Files"
+And for testing..
+
+
+*/
+
+
 //let test_wrapJavascript_file_url_made = false;
 let test_wrapJavascript_file = new _gd_sandbox_file("test_wrapJavascript_file", "text/javascript", `
 onmessage = function(message){

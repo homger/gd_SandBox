@@ -352,7 +352,11 @@ class gd_SandBox{
           file.removeEventListener("filechange", this.test);
         }
     }
-
+    /**Description:editorSetup;
+     *The only use for the moment is calling ~editorSelectorSetup~
+     * ~editorSelectorSetup~ is to create the little widgets at the top of the editor window that allow you to select a different file.
+     * 
+     */
     editorSetup(){
       this.editorSelectorSetup();
     }
