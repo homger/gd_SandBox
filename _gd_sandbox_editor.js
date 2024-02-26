@@ -1000,7 +1000,16 @@ class _gd_sandbox_editor{
     //Don't know how to name it, making this to not replicate code inside keyCombinationKeyAction();
     classicKeyAction_SubFunction(key, keyboardEvent){
         console.log(keyboardEvent.key);
-        if(this.selectionActive){
+        if(!key){
+                if(keyboardEvent.key.length == 1 && keyboardEvent.key.search(VALID_BASIC_TEXT_DATA_VALUES__AS_REGXP) == 0){
+                keyboardEvent.preventDefault();
+                this.deleteSelection();
+                //debugger;
+                this.__print(keyboardEvent.key);
+                console.log("to basic data:  " + keyboardEvent.key);
+            }
+        }
+        else if(this.selectionActive){
             if(key.wrapText){
                 keyboardEvent.preventDefault();
                 if(key.printBrut){
@@ -1047,13 +1056,6 @@ class _gd_sandbox_editor{
             keyboardEvent.preventDefault();
             key.specialFunction();
 
-        }
-        else if(keyboardEvent.key.length == 1 && keyboardEvent.key.search(VALID_BASIC_TEXT_DATA_VALUES__AS_REGXP) == 0){
-            keyboardEvent.preventDefault();
-            this.deleteSelection();
-            //debugger;
-            this.__print(keyboardEvent.key);
-            console.log("to basic data:  " + keyboardEvent.key);
         }
     }
     
