@@ -53,6 +53,7 @@ class gd_SandBox{
       this.dblclickSetup();
       this.editorSetup();
       this.consoleSetup();
+      this.optionsSetup();
     }
     buildUi(){
 
@@ -326,6 +327,9 @@ class gd_SandBox{
     
 
     test(fileEvent){
+      if( !this.optionMap.get("auto_refresh").status ){
+        return;
+      }
       console.log("FILE EVENT TEST");
       //this.viewer.setDocument("<script>window.console = window.parent._gd_SandBox.console;</script>" + fileEvent.content);
       //test_wrapJavascript(fileEvent.content, this.test_wraped_reciveFile.bind(this));
@@ -334,6 +338,13 @@ class gd_SandBox{
         this.viewer.setDocument(fileStr);
       });
       console.log("test(fileEvent){");
+    }
+
+    renderCurrentSelectedFile(){
+      test_wrapJavascript(this.selectedFile.content).then((fileStr) => {
+        console.log("THEN ");
+        this.viewer.setDocument(fileStr);
+      });
     }
 
     test_wraped_reciveFile(fileString){
@@ -426,6 +437,15 @@ class gd_SandBox{
       testConole(this._console, ...data);
     }*/
     
+
+    optionsSetup(){
+      this.optionMap = new Map();
+      this.optionMap.set("auto_refresh", new _gd_sandbox_option("auto_refresh", "checkbox", "toggle auto refresh of the render viewport"));
+      this.optionMap.set("refresh_viewport", new _gd_sandbox_option("refresh_viewport", "function", "refresh the viewport", this.renderCurrentSelectedFile.bind(this)));
+
+      this.header.append(this.optionMap.get("auto_refresh").uiElement)
+      this.header.append(this.optionMap.get("refresh_viewport").uiElement)
+    }
 }
 
 async function gd_search(searchStr){

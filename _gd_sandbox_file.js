@@ -174,3 +174,19 @@ function _fileFromFileData(file){
 function is_gd_sandbox_file(file){
     return (file instanceof _gd_sandbox_file);
 }
+
+/**
+ * text/javascript
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
