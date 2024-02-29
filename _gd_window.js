@@ -106,6 +106,11 @@ class _gd_window{
 
       this.boundingBlock.addEventListener("scroll", this.boundingBlock_scroll);
 
+      
+      this.refreshGeometry();
+      this.sizeCheck();
+      this.setPosition();
+
     }
 
     scrollFix(event){
