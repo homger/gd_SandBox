@@ -82,6 +82,8 @@ class gd_SandBox{
 
       this.main.append(this.viewWindow);
       this.viewWindow_gd_window_object = new _gd_window(this.viewWindow, {defaultPosition:{top: 500, left: 500},boundingBlock: this.main, default_z_index: -1});
+
+      
       
       this.viewer = _gd_sandbox_viewer("gd_viewer");
       this.viewWindow.append(this.viewer);
@@ -255,6 +257,9 @@ class gd_SandBox{
 
         }.bind(this), "close-file"],
       ], ["file","selector"]);
+
+      this.contextMenu.addContextMenu("option");//,[], [folderClassName]);
+      this.contextMenu.addClass("option", "option");
       }
     
     _preventDefault(event){
@@ -445,6 +450,23 @@ class gd_SandBox{
 
       this.header.append(this.optionMap.get("auto_refresh").uiElement)
       this.header.append(this.optionMap.get("refresh_viewport").uiElement)
+
+      this.optionMap.set("toggle_view_window_transition", 
+      new _gd_sandbox_option("toggle_view_window_transition", "checkbox", "toggle transitions of the render viewport"));
+      
+      
+      
+      this.optionMap.get("toggle_view_window_transition").addEventListener("activated",function(event){
+        if(event.status){
+          this.viewWindow_gd_window_object.activateTransition();
+        }
+        else{
+          this.viewWindow_gd_window_object.deactivateTransitions();
+        }
+      }.bind(this));
+
+      this.header.append(this.optionMap.get("toggle_view_window_transition").uiElement);
+      
     }
 }
 

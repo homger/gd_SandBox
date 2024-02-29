@@ -9,7 +9,7 @@ const _gd_sandbox_option_option_type = ["checkbox", "function", "value_range", "
 
 
 class _gd_sandbox_option extends _gd_event{
-    constructor(name, type, description, value = undefined, optionArray = undefined){
+    constructor(name, type, description = "", value = undefined, optionArray = undefined){
         super();
         this.name = name;
         this.type = type;
@@ -30,9 +30,11 @@ class _gd_sandbox_option extends _gd_event{
             case "checkbox":
                 this.option = new __gd_sandbox_option_checkbox(this.name);
                 this.status = this.option.status
+                this.option.optionDescription.innerHTML = this.description
                 break;
             case "function":
                 this.option = new __gd_sandbox_option_function(this.name, this.value);
+                this.option.optionDescription.innerHTML = this.description
                 break;
         }
     }
@@ -56,18 +58,22 @@ class __gd_sandbox_option_checkbox{
         this.uiElement = document.createElement("div");
         this.uiElement.className = "option";
         
-        this.uiItem = document.createElement("checkbox");
+        this.uiItem = document.createElement("INPUT");
         this.uiItem.className = "name";
+        this.uiItem.type = "checkbox";
   
         this.uiElement.append(this.uiItem);
         this.uiElement._gd_oject = this;
   
         this.uiElement._contextmenu_type = "option";
+
+        this.optionDescription = document.createElement("span");
+        this.uiElement.appendChild(this.optionDescription);
       }
     
     activate(){
         this.status = !this.status;
-        
+        this.uiItem.checked = this.status
         console.log("__gd_sandbox_option_checkbox");
         return this.status
     }
@@ -91,6 +97,9 @@ class __gd_sandbox_option_function{
         this.uiElement._gd_oject = this;
   
         this.uiElement._contextmenu_type = "option";
+
+        this.optionDescription = document.createElement("span");
+        this.uiElement.appendChild(this.optionDescription);
       }
     activate(){
         this.call_function();
